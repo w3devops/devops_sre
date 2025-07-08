@@ -1,34 +1,49 @@
-# DevOps/SRE Learning Portfolio
+# 🚀 DevOps/SRE Learning Portfolio
 
-This repository documents my 8-week journey to master DevOps and SRE skills, preparing for a role involving Kubernetes, GitOps, observability, CI/CD, and cloud technologies. It includes hands-on projects, configurations, scripts, and troubleshooting logs.
+> **An 8-week comprehensive journey to master cloud-native technologies and SRE principles**
 
-## Table of Contents
-1. [Week 1: Kubernetes, Docker, Networking, and Security](#week-1)
-2. [Week 2: GitOps, Kustomize, Helm, and Developer Experience](#week-2)
-3. [Week 3: Observability (Prometheus, Grafana)](#week-3)
-4. [Week 4: Advanced Observability (Loki, Tempo, Jaeger)](#week-4)
-5. [Week 5: Service Mesh (Istio)](#week-5)
-6. [Week 6: CI/CD and SRE Principles](#week-6)
-7. [Week 7: Cloud (AWS/EKS, GCP/GKE) and Terraform](#week-7)
-8. [Week 8: Databases, Chaos Engineering, and Interview Prep](#week-8)
-9. [Capstone Project](#capstone-project)
-10. [Runbook](#runbook)
-11. [Interview Notes](#interview-notes)
+This repository documents my structured learning journey to master DevOps and SRE skills, preparing for a role involving Kubernetes, GitOps, observability, CI/CD, and cloud technologies. Each week includes hands-on projects, configurations, scripts, and troubleshooting logs.
 
-## Week 1: Kubernetes, Docker, Networking, and Security
-- **Objective**: Master Kubernetes/Docker basics, networking, security, and scripting.
-- **Tasks**:
-  - Deployed Nginx to Minikube, exposed as a service.
-  - Built a Docker image for a Flask app, pushed to Docker Hub.
-  - Configured Network Policy, RBAC, and scanned images with Trivy.
-  - Wrote Python/Bash scripts for automation.
-  - Set up resource limits and HPA.
-- **Artifacts**:
-  - [Dockerfile](./week1/Dockerfile)
-  - [Network Policy YAML](./week1/network-policy.yaml)
-  - [Python Script](./week1/k8s_query.py)
-  - [Troubleshooting Log](./week1/troubleshooting.md)
-- **Mini-Project**: Deployed a Flask app with resource limits, Network Policy, and RBAC.
+## 📋 Table of Contents
+
+| Week | Focus Area | Key Technologies |
+|------|------------|------------------|
+| [Week 1](#week-1) | Kubernetes & Docker Foundation | Minikube, Docker, RBAC, Network Policies |
+| [Week 2](#week-2) | GitOps & Developer Experience | ArgoCD, Kustomize, Helm |
+| [Week 3](#week-3) | Observability Basics | Prometheus, Grafana, HPA |
+| [Week 4](#week-4) | Advanced Observability | Loki, Tempo, Jaeger, OpenTelemetry |
+| [Week 5](#week-5) | Service Mesh | Istio, mTLS, Circuit Breakers |
+| [Week 6](#week-6) | CI/CD & SRE Principles | Jenkins, Argo Workflows, SLOs |
+| [Week 7](#week-7) | Cloud & Infrastructure | AWS/EKS, GCP/GKE, Terraform |
+| [Week 8](#week-8) | Advanced Topics | Databases, Chaos Engineering |
+
+**Additional Resources:**
+- [Capstone Project](#capstone-project)
+- [Runbook](#runbook)
+- [Interview Notes](#interview-notes)
+
+## 🐳 Week 1: Kubernetes, Docker, Networking, and Security
+
+### 🎯 Objective
+Master Kubernetes/Docker basics, networking, security, and scripting fundamentals.
+
+### ✅ Completed Tasks
+- ✅ Deployed Nginx to Minikube, exposed as a service
+- ✅ Built a Docker image for a Flask app, pushed to Docker Hub
+- ✅ Configured Network Policy, RBAC, and scanned images with Trivy
+- ✅ Wrote Python/Bash scripts for automation
+- ✅ Set up resource limits and HPA
+
+### 📁 Artifacts
+| File | Description |
+|------|-------------|
+| [Dockerfile](./week1/Dockerfile) | Container configuration for Flask app |
+| [Network Policy YAML](./week1/network-policy.yaml) | Kubernetes network security rules |
+| [Python Script](./week1/k8s_query.py) | Automation script for K8s operations |
+| [Troubleshooting Log](./week1/troubleshooting.md) | Debug session documentation |
+
+### 🚀 Mini-Project
+Deployed a Flask app with resource limits, Network Policy, and RBAC - demonstrating production-ready Kubernetes practices.
 
 ## Week 2: GitOps, Kustomize, Helm, and Developer Experience
 - **Objective**: Master GitOps workflows, Kustomize, Helm, and developer collaboration.

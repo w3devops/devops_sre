@@ -1,0 +1,49 @@
+# GitHub Pages Configuration
+title: DevOps/SRE Learning Portfolio
+description: An 8-week journey to master cloud-native technologies and SRE principles
+author: Your Name
+email: your.email@example.com
+
+# Jekyll settings
+markdown: kramdown
+highlighter: rouge
+permalink: pretty
+
+# Collections
+collections:
+  weeks:
+    output: true
+    permalink: /:collection/:name/
+
+# Plugins
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+
+# Include CSS
+include:
+  - assets/css/style.css
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+  - scope:
+      path: ""
+      type: "weeks"
+    values:
+      layout: "week" 

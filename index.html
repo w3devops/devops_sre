@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps/SRE Learning Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .intro h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+
+        .intro p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .weeks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .week-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .week-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .week-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .week-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .week-card ul {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .week-card li {
+            padding: 5px 0;
+            color: #555;
+        }
+
+        .week-card li:before {
+            content: "▸";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .cta-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .cta-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .weeks-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 DevOps/SRE Learning Portfolio</h1>
+            <p>An 8-week journey to master cloud-native technologies and SRE principles</p>
+        </div>
+
+        <div class="main-content">
+            <div class="intro">
+                <h2>Welcome to My Learning Journey</h2>
+                <p>
+                    This repository documents my comprehensive 8-week journey to master DevOps and SRE skills, 
+                    preparing for a role involving Kubernetes, GitOps, observability, CI/CD, and cloud technologies. 
+                    Each week focuses on specific technologies with hands-on projects, configurations, scripts, and troubleshooting logs.
+                </p>
+            </div>
+
+            <div class="weeks-grid">
+                <div class="week-card">
+                    <h3>Week 1: Kubernetes & Docker Foundation</h3>
+                    <p>Master Kubernetes/Docker basics, networking, security, and scripting.</p>
+                    <ul>
+                        <li>Deployed Nginx to Minikube</li>
+                        <li>Built Docker images for Flask apps</li>
+                        <li>Configured Network Policy & RBAC</li>
+                        <li>Image scanning with Trivy</li>
+                    </ul>
+                </div>
+
+                <div class="week-card">
+                    <h3>Week 2: GitOps & Developer Experience</h3>
+                    <p>Master GitOps workflows, Kustomize, Helm, and developer collaboration.</p>
+                    <ul>
+                        <li>Installed and configured ArgoCD</li>
+                        <li>Created Kustomize manifests</li>
+                        <li>Packaged apps as Helm charts</li>
+                        <li>Developer guides and documentation</li>
+                    </ul>
+                </div>
+
+                <div class="week-card">
+                    <h3>Week 3: Observability Basics</h3>
+                    <p>Learn monitoring and metrics with Prometheus and Grafana.</p>
+                    <ul>
+                        <li>Installed Prometheus/Grafana</li>
+                        <li>Created custom dashboards</li>
+                        <li>Set up HPA and alerts</li>
+                        <li>Debugged high-load issues</li>
+                    </ul>
+                </div>
+
+                <div class="week-card">
+                    <h3>Week 4: Advanced Observability</h3>
+                    <p>Master logging, tracing, and secrets management.</p>
+                    <ul>
+                        <li>Configured Loki for logs</li>
+                        <li>Set up Tempo/Jaeger for traces</li>
+                        <li>Instrumented with OpenTelemetry</li>
+                        <li>Kubernetes Secrets management</li>
+                    </ul>
+                </div>
+
+                <div class="week-card">
+                    <h3>Week 5: Service Mesh (Istio)</h3>
+                    <p>Learn Istio for microservices and security.</p>
+                    <ul>
+                        <li>Installed and configured Istio</li>
+                        <li>Deployed Bookinfo application</li>
+                        <li>Configured routing and mTLS</li>
+                        <li>Circuit breakers and traffic mirroring</li>
+                    </ul>
+                </div>
+
+                <div class="week-card">
+                    <h3>Week 6: CI/CD & SRE Principles</h3>
+                    <p>Master CI/CD pipelines and SRE concepts.</p>
+                    <ul>
+                        <li>Built Jenkins pipelines</li>
+                        <li>Created Argo Workflows</li>
+                        <li>Defined SLOs/SLIs</li>
+                        <li>Error budget calculations</li>
+                    </ul>
+                </div>
+
+                <div class="week-card">
+                    <h3>Week 7: Cloud & Infrastructure</h3>
+                    <p>Learn cloud-native Kubernetes and Infrastructure as Code.</p>
+                    <ul>
+                        <li>Created EKS/GKE clusters</li>
+                        <li>Used Terraform for provisioning</li>
+                        <li>Cloud SQL integration</li>
+                        <li>Cost analysis and optimization</li>
+                    </ul>
+                </div>
+
+                <div class="week-card">
+                    <h3>Week 8: Advanced Topics</h3>
+                    <p>Databases, chaos engineering, and interview preparation.</p>
+                    <ul>
+                        <li>Postgres with Operator</li>
+                        <li>Chaos experiments with LitmusChaos</li>
+                        <li>System design practice</li>
+                        <li>Interview preparation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <h3>Ready to Explore?</h3>
+                <p>Dive into the detailed documentation and hands-on projects from each week.</p>
+                <a href="README.md" class="btn">View Full Documentation</a>
+                <a href="Plan.md" class="btn">View Learning Plan</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Built with ❤️ for the DevOps/SRE community</p>
+            <p>Last updated: July 2025</p>
+        </div>
+    </div>
+</body>
+</html> 
