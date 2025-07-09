@@ -45,6 +45,9 @@ Master Kubernetes/Docker basics, networking, security, and scripting fundamental
 ### 🚀 Mini-Project
 Deployed a Flask app with resource limits, Network Policy, and RBAC - demonstrating production-ready Kubernetes practices.
 
+### 📚 **Detailed Content**
+- [Day 1: Kubernetes Basics](./week1/Day1/README.md) - Complete Kubernetes architecture and fundamentals
+
 ## Week 2: GitOps, Kustomize, Helm, and Developer Experience
 - **Objective**: Master GitOps workflows, Kustomize, Helm, and developer collaboration.
 - **Tasks**:
