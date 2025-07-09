@@ -130,6 +130,13 @@
             padding: 20px;
             background: #f8f9fa;
             border-radius: 10px;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
         }
 
         .btn {
@@ -193,6 +200,23 @@
             
             .header h1 {
                 font-size: 2rem;
+            }
+
+            .mermaid {
+                padding: 10px;
+                margin: 15px 0;
+            }
+
+            .mermaid svg {
+                transform: scale(0.8);
+                transform-origin: top left;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mermaid svg {
+                transform: scale(0.6);
+                transform-origin: top left;
             }
         }
     </style>
@@ -259,73 +283,50 @@
             <div class="mermaid">
                 graph TB
                     subgraph "Control Plane"
-                        API[kube-apiserver<br/>API Server]
-                        ETCD[etcd<br/>Key-Value Store]
-                        SCHED[kube-scheduler<br/>Scheduler]
-                        CM[kube-controller-manager<br/>Controller Manager]
-                        CCM[cloud-controller-manager<br/>Cloud Controller]
+                        API[API Server]
+                        ETCD[etcd Store]
+                        SCHED[Scheduler]
+                        CM[Controller Manager]
                     end
                     
-                    subgraph "Worker Node 1"
-                        KUBELET1[kubelet<br/>Node Agent]
-                        PROXY1[kube-proxy<br/>Network Proxy]
-                        RUNTIME1[Container Runtime<br/>containerd/CRI-O]
-                        POD1[Pod 1<br/>App Container]
-                        POD2[Pod 2<br/>App Container]
-                    end
-                    
-                    subgraph "Worker Node 2"
-                        KUBELET2[kubelet<br/>Node Agent]
-                        PROXY2[kube-proxy<br/>Network Proxy]
-                        RUNTIME2[Container Runtime<br/>containerd/CRI-O]
-                        POD3[Pod 3<br/>App Container]
-                        POD4[Pod 4<br/>App Container]
-                    end
-                    
-                    subgraph "Worker Node N"
-                        KUBELETN[kubelet<br/>Node Agent]
-                        PROXYN[kube-proxy<br/>Network Proxy]
-                        RUNTIMEN[Container Runtime<br/>containerd/CRI-O]
-                        PODN1[Pod N<br/>App Container]
+                    subgraph "Worker Node"
+                        KUBELET[kubelet]
+                        PROXY[kube-proxy]
+                        RUNTIME[Container Runtime]
+                        POD1[Pod 1]
+                        POD2[Pod 2]
                     end
                     
                     %% Control Plane connections
                     API --> ETCD
                     API --> SCHED
                     API --> CM
-                    API --> CCM
                     
-                    %% API Server to Worker Nodes
-                    API -.->|API Calls| KUBELET1
-                    API -.->|API Calls| KUBELET2
-                    API -.->|API Calls| KUBELETN
+                    %% API Server to Worker Node
+                    API -.->|API Calls| KUBELET
                     
                     %% Worker Node internal connections
-                    KUBELET1 --> RUNTIME1
-                    KUBELET2 --> RUNTIME2
-                    KUBELETN --> RUNTIMEN
-                    
-                    RUNTIME1 --> POD1
-                    RUNTIME1 --> POD2
-                    RUNTIME2 --> POD3
-                    RUNTIME2 --> POD4
-                    RUNTIMEN --> PODN1
+                    KUBELET --> RUNTIME
+                    RUNTIME --> POD1
+                    RUNTIME --> POD2
                     
                     %% Network proxy connections
-                    PROXY1 -.->|Network Rules| POD1
-                    PROXY1 -.->|Network Rules| POD2
-                    PROXY2 -.->|Network Rules| POD3
-                    PROXY2 -.->|Network Rules| POD4
-                    PROXYN -.->|Network Rules| PODN1
+                    PROXY -.->|Network Rules| POD1
+                    PROXY -.->|Network Rules| POD2
                     
                     %% Styling
                     classDef controlPlane fill:#e1f5fe,stroke:#01579b,stroke-width:2px
                     classDef workerNode fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
                     classDef pod fill:#e8f5e8,stroke:#2e7d32,stroke-width:1px
                     
-                    class API,ETCD,SCHED,CM,CCM controlPlane
-                    class KUBELET1,PROXY1,RUNTIME1,KUBELET2,PROXY2,RUNTIME2,KUBELETN,PROXYN,RUNTIMEN workerNode
-                    class POD1,POD2,POD3,POD4,PODN1 pod
+                    class API,ETCD,SCHED,CM controlPlane
+                    class KUBELET,PROXY,RUNTIME workerNode
+                    class POD1,POD2 pod
+            </div>
+            
+            <div class="goal-box">
+                <h4>📱 Mobile-Friendly Version</h4>
+                <p>This simplified diagram shows the core Kubernetes architecture optimized for mobile viewing. The full diagram with multiple worker nodes is available on desktop.</p>
             </div>
 
             <h2>🔧 Architecture Components Explained</h2>
@@ -478,6 +479,246 @@ kube-system   storage-provisioner                1/1     Running   0          2m
                 </ul>
             </div>
 
+            <h2>🎛️ Kubernetes Dashboard & Monitoring</h2>
+            
+            <div class="component-box">
+                <h3>📊 Step 7: Access Kubernetes Dashboard</h3>
+                <p>Launch the Kubernetes web dashboard for visual cluster management:</p>
+                <pre><code>minikube dashboard</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>🔌  Enabling dashboard ...
+    ▪ Using image docker.io/kubernetesui/dashboard:v2.7.0
+    ▪ Using image docker.io/kubernetesui/metrics-scraper:v1.0.8
+💡  Some dashboard features require the metrics-server addon. To enable all features please run:
+
+	minikube addons enable metrics-server
+
+🤔  Verifying dashboard health ...
+🚀  Launching proxy ...
+🤔  Verifying proxy health ...
+
+🎉  Opening http://127.0.0.1:39373/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/ in your default browser...
+Opening in existing browser session.</code></pre>
+                
+                <div class="goal-box">
+                    <h4>💡 Dashboard Features</h4>
+                    <ul>
+                        <li><strong>Cluster Overview:</strong> View all nodes, pods, and services</li>
+                        <li><strong>Resource Management:</strong> Create, edit, and delete resources</li>
+                        <li><strong>Logs & Shell:</strong> Access container logs and execute commands</li>
+                        <li><strong>Metrics:</strong> View CPU, memory, and network usage (with metrics-server)</li>
+                        <li><strong>Namespace Management:</strong> Organize and manage different environments</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="component-box">
+                <h3>📈 Step 8: Enable Metrics Server</h3>
+                <p>Enable the metrics-server addon for enhanced monitoring capabilities:</p>
+                <pre><code>minikube addons enable metrics-server</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>💡  metrics-server is an addon maintained by Kubernetes. For any concerns contact minikube on GitHub.
+You can view the list of minikube maintainers at: https://github.com/kubernetes/minikube/blob/master/OWNERS
+    ▪ Using image registry.k8s.io/metrics-server/metrics-server:v0.7.2
+🌟  The 'metrics-server' addon is enabled</code></pre>
+                
+                <div class="goal-box">
+                    <h4>📊 Metrics Server Benefits</h4>
+                    <ul>
+                        <li><strong>Resource Monitoring:</strong> Real-time CPU and memory usage</li>
+                        <li><strong>HPA Support:</strong> Enable Horizontal Pod Autoscaler</li>
+                        <li><strong>Dashboard Integration:</strong> Enhanced dashboard metrics</li>
+                        <li><strong>Performance Insights:</strong> Identify resource bottlenecks</li>
+                        <li><strong>Capacity Planning:</strong> Better resource allocation decisions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="component-box">
+                <h3>🔍 Dashboard Navigation Tips</h3>
+                <p>Once the dashboard opens in your browser:</p>
+                <ul class="task-list">
+                    <li><strong>Overview:</strong> Start with the cluster overview page</li>
+                    <li><strong>Namespaces:</strong> Switch between different namespaces (default, kube-system)</li>
+                    <li><strong>Workloads:</strong> View deployments, pods, and replica sets</li>
+                    <li><strong>Services:</strong> Check networking and service configurations</li>
+                    <li><strong>Storage:</strong> Monitor persistent volumes and claims</li>
+                    <li><strong>Config & Storage:</strong> Manage ConfigMaps and Secrets</li>
+                </ul>
+            </div>
+
+            <div class="component-box">
+                <h3>🛠️ Useful Dashboard Commands</h3>
+                <p>Additional commands for dashboard management:</p>
+                <pre><code># Check dashboard status
+minikube dashboard --url
+
+# Enable other useful addons
+minikube addons list
+minikube addons enable ingress
+minikube addons enable storage-provisioner
+
+# Access dashboard from remote machine
+minikube dashboard --url --port=8080</code></pre>
+            </div>
+
+            <h2>🚀 Hands-On Practice: Deploy Nginx</h2>
+            
+            <div class="component-box">
+                <h3>📝 Step 9: Create Nginx Pod</h3>
+                <p>First, let's create a simple Nginx pod using a YAML manifest:</p>
+                
+                <h4>Create the YAML file:</h4>
+                <pre><code># Create practice directory
+mkdir -p practice
+
+# Create nginx.yaml file
+cat &gt; practice/nginx.yaml &lt;&lt; 'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    app: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+EOF</code></pre>
+                
+                <h4>Apply the manifest:</h4>
+                <pre><code>kubectl apply -f practice/nginx.yaml</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>pod/nginx created</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>✅ Step 10: Verify Pod Status</h3>
+                <p>Check that the pod is running successfully:</p>
+                <pre><code>kubectl get pods</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>NAME    READY   STATUS    RESTARTS   AGE
+nginx   1/1     Running   0          20s</code></pre>
+                
+                <div class="goal-box">
+                    <h4>🎯 Understanding Pod Status</h4>
+                    <ul>
+                        <li><strong>READY:</strong> 1/1 means 1 container is ready out of 1 total</li>
+                        <li><strong>STATUS:</strong> Running indicates the pod is active</li>
+                        <li><strong>RESTARTS:</strong> 0 means no restarts occurred</li>
+                        <li><strong>AGE:</strong> How long the pod has been running</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="component-box">
+                <h3>🌐 Step 11: Expose Pod as Service</h3>
+                <p>Create a service to make the Nginx pod accessible:</p>
+                <pre><code>kubectl expose pod nginx --port=80 --type=NodePort</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>service/nginx exposed</code></pre>
+                
+                <h4>Check service details:</h4>
+                <pre><code>kubectl get svc</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>NAME         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+kubernetes   ClusterIP   10.96.0.1        &lt;none&gt;        443/TCP        24m
+nginx        NodePort    10.108.195.122   &lt;none&gt;        80:31393/TCP   20s</code></pre>
+                
+                <div class="goal-box">
+                    <h4>🔍 Service Types Explained</h4>
+                    <ul>
+                        <li><strong>ClusterIP:</strong> Internal cluster access only</li>
+                        <li><strong>NodePort:</strong> External access via node IP and port</li>
+                        <li><strong>LoadBalancer:</strong> Cloud provider load balancer</li>
+                        <li><strong>ExternalName:</strong> DNS CNAME record</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="component-box">
+                <h3>🌍 Step 12: Access the Application</h3>
+                <p>Get the Minikube IP and access your Nginx application:</p>
+                
+                <h4>Get Minikube IP:</h4>
+                <pre><code>minikube ip</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>192.168.49.2</code></pre>
+                
+                <h4>Access the application:</h4>
+                <pre><code>curl http://192.168.49.2:31393</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;Welcome to nginx!&lt;/title&gt;
+&lt;style&gt;
+html { color-scheme: light dark; }
+body { width: 35em; margin: 0 auto;
+font-family: Tahoma, Verdana, Arial, sans-serif; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Welcome to nginx!&lt;/h1&gt;
+&lt;p&gt;If you see this page, the nginx web server is successfully installed and
+working. Further configuration is required.&lt;/p&gt;
+
+&lt;p&gt;For online documentation and support please refer to
+&lt;a href="http://nginx.org/"&gt;nginx.org&lt;/a&gt;.&lt;br/&gt;
+Commercial support is available at
+&lt;a href="http://nginx.com/"&gt;nginx.com&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Thank you for using nginx.&lt;/em&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                
+                <div class="goal-box">
+                    <h4>🎉 Success Indicators</h4>
+                    <ul>
+                        <li><strong>✅ Pod Running:</strong> Nginx container is active</li>
+                        <li><strong>✅ Service Created:</strong> NodePort service exposed</li>
+                        <li><strong>✅ External Access:</strong> Can access via Minikube IP</li>
+                        <li><strong>✅ Web Response:</strong> Nginx welcome page displayed</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="component-box">
+                <h3>🔍 Step 13: Explore kubectl Commands</h3>
+                <p>Practice these essential kubectl commands:</p>
+                <pre><code># Get detailed pod information
+kubectl describe pod nginx
+
+# View pod logs
+kubectl logs nginx
+
+# Get pod details in YAML format
+kubectl get pod nginx -o yaml
+
+# Execute command inside the pod
+kubectl exec -it nginx -- /bin/bash
+
+# Get service details
+kubectl describe service nginx
+
+# Delete the resources
+kubectl delete service nginx
+kubectl delete pod nginx</code></pre>
+                
+                <div class="goal-box">
+                    <h4>📚 Learning Objectives Achieved</h4>
+                    <ul>
+                        <li><strong>✅ Pod Creation:</strong> Deployed container using YAML</li>
+                        <li><strong>✅ Service Exposure:</strong> Made pod accessible externally</li>
+                        <li><strong>✅ Network Access:</strong> Accessed application via NodePort</li>
+                        <li><strong>✅ kubectl Practice:</strong> Used essential commands</li>
+                        <li><strong>✅ Resource Management:</strong> Created and managed Kubernetes resources</li>
+                    </ul>
+                </div>
+            </div>
+
             <h2>📚 Resources</h2>
             <ul>
                 <li><a href="https://kubernetes.io/docs/" target="_blank">Kubernetes Official Documentation</a></li>
@@ -495,15 +736,34 @@ kube-system   storage-provisioner                1/1     Running   0          2m
     </div>
 
     <script>
-        // Initialize Mermaid
+        // Initialize Mermaid with mobile-friendly settings
         mermaid.initialize({
             startOnLoad: true,
             theme: 'default',
             flowchart: {
                 useMaxWidth: true,
-                htmlLabels: true
-            }
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            responsive: true
         });
+
+        // Handle mobile viewport
+        function adjustMermaidForMobile() {
+            const mermaidDivs = document.querySelectorAll('.mermaid');
+            mermaidDivs.forEach(div => {
+                const svg = div.querySelector('svg');
+                if (svg && window.innerWidth <= 768) {
+                    svg.style.maxWidth = '100%';
+                    svg.style.height = 'auto';
+                }
+            });
+        }
+
+        // Adjust on load and resize
+        window.addEventListener('load', adjustMermaidForMobile);
+        window.addEventListener('resize', adjustMermaidForMobile);
     </script>
 </body>
 </html> 
