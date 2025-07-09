@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps/SRE Learning Portfolio - Documentation</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h1, h2, h3 {
+            color: #667eea;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        th, td {
+            border: 1px solid #e1e4e8;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #f6f8fa;
+            font-weight: 600;
+        }
+
+        .week-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .week-section h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .task-list li:before {
+            content: "✅";
+            margin-right: 10px;
+            color: #28a745;
+        }
+
+        .artifact-table {
+            margin: 20px 0;
+        }
+
+        .artifact-table th {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .nav-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 DevOps/SRE Learning Portfolio</h1>
+            <p>An 8-week comprehensive journey to master cloud-native technologies and SRE principles</p>
+        </div>
+
+        <div class="breadcrumb">
+            <a href="index.html">Home</a> > Documentation
+        </div>
+
+        <div class="content">
+            <h1>📋 Complete Learning Journey</h1>
+            
+            <p>This repository documents my structured learning journey to master DevOps and SRE skills, preparing for a role involving Kubernetes, GitOps, observability, CI/CD, and cloud technologies. Each week includes hands-on projects, configurations, scripts, and troubleshooting logs.</p>
+
+            <h2>📋 Table of Contents</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Week</th>
+                        <th>Focus Area</th>
+                        <th>Key Technologies</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="#week-1">Week 1</a></td>
+                        <td>Kubernetes & Docker Foundation</td>
+                        <td>Minikube, Docker, RBAC, Network Policies</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#week-2">Week 2</a></td>
+                        <td>GitOps & Developer Experience</td>
+                        <td>ArgoCD, Kustomize, Helm</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#week-3">Week 3</a></td>
+                        <td>Observability Basics</td>
+                        <td>Prometheus, Grafana, HPA</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#week-4">Week 4</a></td>
+                        <td>Advanced Observability</td>
+                        <td>Loki, Tempo, Jaeger, OpenTelemetry</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#week-5">Week 5</a></td>
+                        <td>Service Mesh</td>
+                        <td>Istio, mTLS, Circuit Breakers</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#week-6">Week 6</a></td>
+                        <td>CI/CD & SRE Principles</td>
+                        <td>Jenkins, Argo Workflows, SLOs</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#week-7">Week 7</a></td>
+                        <td>Cloud & Infrastructure</td>
+                        <td>AWS/EKS, GCP/GKE, Terraform</td>
+                    </tr>
+                    <tr>
+                        <td><a href="#week-8">Week 8</a></td>
+                        <td>Advanced Topics</td>
+                        <td>Databases, Chaos Engineering</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div id="week-1" class="week-section">
+                <h3>🐳 Week 1: Kubernetes, Docker, Networking, and Security</h3>
+                
+                <h4>🎯 Objective</h4>
+                <p>Master Kubernetes/Docker basics, networking, security, and scripting fundamentals.</p>
+                
+                <h4>✅ Completed Tasks</h4>
+                <ul class="task-list">
+                    <li>Deployed Nginx to Minikube, exposed as a service</li>
+                    <li>Built a Docker image for a Flask app, pushed to Docker Hub</li>
+                    <li>Configured Network Policy, RBAC, and scanned images with Trivy</li>
+                    <li>Wrote Python/Bash scripts for automation</li>
+                    <li>Set up resource limits and HPA</li>
+                </ul>
+                
+                <h4>📁 Artifacts</h4>
+                <table class="artifact-table">
+                    <tr>
+                        <th>File</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><a href="week1/Dockerfile">Dockerfile</a></td>
+                        <td>Container configuration for Flask app</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week1/network-policy.yaml">Network Policy YAML</a></td>
+                        <td>Kubernetes network security rules</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week1/k8s_query.py">Python Script</a></td>
+                        <td>Automation script for K8s operations</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week1/troubleshooting.md">Troubleshooting Log</a></td>
+                        <td>Debug session documentation</td>
+                    </tr>
+                </table>
+                
+                <h4>🚀 Mini-Project</h4>
+                <p>Deployed a Flask app with resource limits, Network Policy, and RBAC - demonstrating production-ready Kubernetes practices.</p>
+                
+                <h4>📚 Detailed Content</h4>
+                <ul>
+                    <li><a href="week1/Day1/README.md">Day 1: Kubernetes Basics</a> - Complete Kubernetes architecture and fundamentals</li>
+                </ul>
+            </div>
+
+            <div id="week-2" class="week-section">
+                <h3>🔄 Week 2: GitOps, Kustomize, Helm, and Developer Experience</h3>
+                
+                <h4>🎯 Objective</h4>
+                <p>Master GitOps workflows, Kustomize, Helm, and developer collaboration.</p>
+                
+                <h4>✅ Completed Tasks</h4>
+                <ul class="task-list">
+                    <li>Installed ArgoCD, deployed app via GitOps</li>
+                    <li>Created Kustomize manifests for dev/staging environments</li>
+                    <li>Packaged a Flask app as a Helm chart</li>
+                    <li>Wrote a developer guide for Kustomize and compared Fluentd vs. Loki</li>
+                </ul>
+                
+                <h4>📁 Artifacts</h4>
+                <table class="artifact-table">
+                    <tr>
+                        <th>File</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><a href="week2/kustomize/">Kustomize Manifests</a></td>
+                        <td>Environment-specific configurations</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week2/helm/">Helm Chart</a></td>
+                        <td>Packaged application deployment</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week2/developer-guide.md">Developer Guide</a></td>
+                        <td>Comprehensive development documentation</td>
+                    </tr>
+                </table>
+                
+                <h4>🚀 Mini-Project</h4>
+                <p>Deployed Flask + Redis app using Kustomize, Helm, and ArgoCD.</p>
+            </div>
+
+            <div id="week-3" class="week-section">
+                <h3>📊 Week 3: Observability (Prometheus, Grafana)</h3>
+                
+                <h4>🎯 Objective</h4>
+                <p>Learn monitoring and metrics.</p>
+                
+                <h4>✅ Completed Tasks</h4>
+                <ul class="task-list">
+                    <li>Installed Prometheus/Grafana, configured metrics scraping</li>
+                    <li>Created Grafana dashboards for CPU/memory/HTTP metrics</li>
+                    <li>Set up HPA and alerts, debugged high-load issue</li>
+                </ul>
+                
+                <h4>📁 Artifacts</h4>
+                <table class="artifact-table">
+                    <tr>
+                        <th>File</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><a href="week3/prometheus.yml">Prometheus Config</a></td>
+                        <td>Metrics collection configuration</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week3/dashboard.json">Grafana Dashboard JSON</a></td>
+                        <td>Custom monitoring dashboards</td>
+                    </tr>
+                </table>
+                
+                <h4>🚀 Mini-Project</h4>
+                <p>Monitored a microservices app with Prometheus/Grafana and HPA.</p>
+            </div>
+
+            <div id="week-4" class="week-section">
+                <h3>🔍 Week 4: Advanced Observability (Loki, Tempo, Jaeger)</h3>
+                
+                <h4>🎯 Objective</h4>
+                <p>Master logging, tracing, and secrets management.</p>
+                
+                <h4>✅ Completed Tasks</h4>
+                <ul class="task-list">
+                    <li>Configured Loki for logs, Tempo/Jaeger for traces</li>
+                    <li>Instrumented app with OpenTelemetry, stored secrets in Kubernetes Secrets</li>
+                    <li>Debugged tracing/logging issues</li>
+                </ul>
+                
+                <h4>📁 Artifacts</h4>
+                <table class="artifact-table">
+                    <tr>
+                        <th>File</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><a href="week4/otel-config.yaml">OpenTelemetry Config</a></td>
+                        <td>Distributed tracing configuration</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week4/secrets.yaml">Secrets YAML</a></td>
+                        <td>Kubernetes secrets management</td>
+                    </tr>
+                </table>
+                
+                <h4>🚀 Mini-Project</h4>
+                <p>Deployed a multi-service app with unified observability.</p>
+            </div>
+
+            <div id="week-5" class="week-section">
+                <h3>🌐 Week 5: Service Mesh (Istio)</h3>
+                
+                <h4>🎯 Objective</h4>
+                <p>Learn Istio for microservices and security.</p>
+                
+                <h4>✅ Completed Tasks</h4>
+                <ul class="task-list">
+                    <li>Installed Istio, deployed Bookinfo app</li>
+                    <li>Configured routing, mTLS, circuit breakers, and traffic mirroring</li>
+                    <li>Debugged Istio issues with istioctl, compared Istio vs. Linkerd</li>
+                </ul>
+                
+                <h4>📁 Artifacts</h4>
+                <table class="artifact-table">
+                    <tr>
+                        <th>File</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><a href="week5/virtual-service.yaml">Istio Virtual Service</a></td>
+                        <td>Traffic routing configuration</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week5/istio-vs-linkerd.md">Comparison Table</a></td>
+                        <td>Service mesh comparison analysis</td>
+                    </tr>
+                </table>
+                
+                <h4>🚀 Mini-Project</h4>
+                <p>Deployed a microservices app with Istio and monitoring.</p>
+            </div>
+
+            <div id="week-6" class="week-section">
+                <h3>⚙️ Week 6: CI/CD and SRE Principles</h3>
+                
+                <h4>🎯 Objective</h4>
+                <p>Master CI/CD pipelines and SRE concepts.</p>
+                
+                <h4>✅ Completed Tasks</h4>
+                <ul class="task-list">
+                    <li>Built Jenkins pipeline with parallel stages</li>
+                    <li>Created Argo Workflows for task orchestration</li>
+                    <li>Defined SLOs/SLIs, calculated error budget, simulated on-call response</li>
+                </ul>
+                
+                <h4>📁 Artifacts</h4>
+                <table class="artifact-table">
+                    <tr>
+                        <th>File</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><a href="week6/Jenkinsfile">Jenkinsfile</a></td>
+                        <td>CI/CD pipeline configuration</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week6/slo.md">SLO Definition</a></td>
+                        <td>Service level objectives documentation</td>
+                    </tr>
+                </table>
+                
+                <h4>🚀 Mini-Project</h4>
+                <p>Deployed app with Jenkins/ArgoCD, monitored SLOs.</p>
+            </div>
+
+            <div id="week-7" class="week-section">
+                <h3>☁️ Week 7: Cloud (AWS/EKS, GCP/GKE) and Terraform</h3>
+                
+                <h4>🎯 Objective</h4>
+                <p>Learn cloud-native Kubernetes and IaC.</p>
+                
+                <h4>✅ Completed Tasks</h4>
+                <ul class="task-list">
+                    <li>Created EKS/GKE clusters, deployed apps</li>
+                    <li>Used Terraform to provision EKS, experimented with Cloud SQL</li>
+                    <li>Analyzed costs with AWS Cost Explorer</li>
+                </ul>
+                
+                <h4>📁 Artifacts</h4>
+                <table class="artifact-table">
+                    <tr>
+                        <th>File</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><a href="week7/terraform/">Terraform Scripts</a></td>
+                        <td>Infrastructure as Code configurations</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week7/cost-analysis.md">Cost Analysis</a></td>
+                        <td>Cloud cost optimization insights</td>
+                    </tr>
+                </table>
+                
+                <h4>🚀 Mini-Project</h4>
+                <p>Deployed app to EKS with Terraform and Cloud SQL.</p>
+            </div>
+
+            <div id="week-8" class="week-section">
+                <h3>🎯 Week 8: Databases, Chaos Engineering, and Interview Prep</h3>
+                
+                <h4>🎯 Objective</h4>
+                <p>Learn stateful apps, chaos engineering, and interview skills.</p>
+                
+                <h4>✅ Completed Tasks</h4>
+                <ul class="task-list">
+                    <li>Deployed Postgres with Operator, configured backups with Velero</li>
+                    <li>Ran chaos experiments with LitmusChaos</li>
+                    <li>Designed a Kubernetes system, practiced coding and behavioral interviews</li>
+                </ul>
+                
+                <h4>📁 Artifacts</h4>
+                <table class="artifact-table">
+                    <tr>
+                        <th>File</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><a href="week8/postgres.yaml">Postgres Operator YAML</a></td>
+                        <td>Database deployment configuration</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week8/chaos.md">Chaos Experiment Log</a></td>
+                        <td>Resilience testing documentation</td>
+                    </tr>
+                    <tr>
+                        <td><a href="week8/design.png">System Design Diagram</a></td>
+                        <td>Architecture design visualization</td>
+                    </tr>
+                </table>
+                
+                <h4>🚀 Capstone Project</h4>
+                <p>Deployed Flask + Postgres app to EKS/GKE with Terraform, ArgoCD, Istio, and observability. Tested resilience and optimized costs.</p>
+            </div>
+
+            <h2>📚 Additional Resources</h2>
+            
+            <div class="week-section">
+                <h3>🎯 Capstone Project</h3>
+                <p>Deployed Flask + Postgres app to EKS/GKE with Terraform, ArgoCD, Istio, and observability. Tested resilience and optimized costs.</p>
+            </div>
+
+            <div class="week-section">
+                <h3>📖 Runbook</h3>
+                <p><strong>Purpose:</strong> Guide for deploying and managing the capstone project.</p>
+                <h4>Steps:</h4>
+                <ol>
+                    <li>Provision EKS cluster with Terraform.</li>
+                    <li>Deploy app with ArgoCD and Istio.</li>
+                    <li>Configure Prometheus/Loki/Tempo for observability.</li>
+                    <li>Set up SLOs and alerts.</li>
+                    <li>Run chaos experiments to test resilience.</li>
+                </ol>
+                <p><strong>Troubleshooting:</strong> Common issues and fixes (e.g., pod crashes, routing failures).</p>
+                <p><a href="runbook.md">Full Runbook</a></p>
+            </div>
+
+            <div class="week-section">
+                <h3>💼 Interview Notes</h3>
+                <ul>
+                    <li><strong>Technical Questions:</strong> Kubernetes debugging, Istio routing, SLO definitions.</li>
+                    <li><strong>System Design:</strong> Scalable Kubernetes architecture with observability and CI/CD.</li>
+                    <li><strong>Behavioral Stories:</strong> Incident response, automation, developer collaboration.</li>
+                </ul>
+                <p><a href="interview-notes.md">Full Notes</a></p>
+            </div>
+
+            <div class="nav-buttons">
+                <a href="index.html" class="btn">← Back to Home</a>
+                <a href="Plan.md" class="btn">View Learning Plan</a>
+                <a href="week1/Day1/README.md" class="btn">Week 1: Kubernetes Basics</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
