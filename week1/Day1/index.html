@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Week 1 Day 1: Kubernetes Basics - DevOps/SRE Learning Portfolio</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -256,75 +257,75 @@
             <h2>📊 Kubernetes Architecture Diagram</h2>
             
             <div class="mermaid">
-                <pre><code>graph TB
-    subgraph "Control Plane"
-        API[kube-apiserver&lt;br/&gt;API Server]
-        ETCD[etcd&lt;br/&gt;Key-Value Store]
-        SCHED[kube-scheduler&lt;br/&gt;Scheduler]
-        CM[kube-controller-manager&lt;br/&gt;Controller Manager]
-        CCM[cloud-controller-manager&lt;br/&gt;Cloud Controller]
-    end
-    
-    subgraph "Worker Node 1"
-        KUBELET1[kubelet&lt;br/&gt;Node Agent]
-        PROXY1[kube-proxy&lt;br/&gt;Network Proxy]
-        RUNTIME1[Container Runtime&lt;br/&gt;containerd/CRI-O]
-        POD1[Pod 1&lt;br/&gt;App Container]
-        POD2[Pod 2&lt;br/&gt;App Container]
-    end
-    
-    subgraph "Worker Node 2"
-        KUBELET2[kubelet&lt;br/&gt;Node Agent]
-        PROXY2[kube-proxy&lt;br/&gt;Network Proxy]
-        RUNTIME2[Container Runtime&lt;br/&gt;containerd/CRI-O]
-        POD3[Pod 3&lt;br/&gt;App Container]
-        POD4[Pod 4&lt;br/&gt;App Container]
-    end
-    
-    subgraph "Worker Node N"
-        KUBELETN[kubelet&lt;br/&gt;Node Agent]
-        PROXYN[kube-proxy&lt;br/&gt;Network Proxy]
-        RUNTIMEN[Container Runtime&lt;br/&gt;containerd/CRI-O]
-        PODN1[Pod N&lt;br/&gt;App Container]
-    end
-    
-    %% Control Plane connections
-    API --> ETCD
-    API --> SCHED
-    API --> CM
-    API --> CCM
-    
-    %% API Server to Worker Nodes
-    API -.->|API Calls| KUBELET1
-    API -.->|API Calls| KUBELET2
-    API -.->|API Calls| KUBELETN
-    
-    %% Worker Node internal connections
-    KUBELET1 --> RUNTIME1
-    KUBELET2 --> RUNTIME2
-    KUBELETN --> RUNTIMEN
-    
-    RUNTIME1 --> POD1
-    RUNTIME1 --> POD2
-    RUNTIME2 --> POD3
-    RUNTIME2 --> POD4
-    RUNTIMEN --> PODN1
-    
-    %% Network proxy connections
-    PROXY1 -.->|Network Rules| POD1
-    PROXY1 -.->|Network Rules| POD2
-    PROXY2 -.->|Network Rules| POD3
-    PROXY2 -.->|Network Rules| POD4
-    PROXYN -.->|Network Rules| PODN1
-    
-    %% Styling
-    classDef controlPlane fill:#e1f5fe,stroke:#01579b,stroke-width:2px
-    classDef workerNode fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef pod fill:#e8f5e8,stroke:#2e7d32,stroke-width:1px
-    
-    class API,ETCD,SCHED,CM,CCM controlPlane
-    class KUBELET1,PROXY1,RUNTIME1,KUBELET2,PROXY2,RUNTIME2,KUBELETN,PROXYN,RUNTIMEN workerNode
-    class POD1,POD2,POD3,POD4,PODN1 pod</code></pre>
+                graph TB
+                    subgraph "Control Plane"
+                        API[kube-apiserver<br/>API Server]
+                        ETCD[etcd<br/>Key-Value Store]
+                        SCHED[kube-scheduler<br/>Scheduler]
+                        CM[kube-controller-manager<br/>Controller Manager]
+                        CCM[cloud-controller-manager<br/>Cloud Controller]
+                    end
+                    
+                    subgraph "Worker Node 1"
+                        KUBELET1[kubelet<br/>Node Agent]
+                        PROXY1[kube-proxy<br/>Network Proxy]
+                        RUNTIME1[Container Runtime<br/>containerd/CRI-O]
+                        POD1[Pod 1<br/>App Container]
+                        POD2[Pod 2<br/>App Container]
+                    end
+                    
+                    subgraph "Worker Node 2"
+                        KUBELET2[kubelet<br/>Node Agent]
+                        PROXY2[kube-proxy<br/>Network Proxy]
+                        RUNTIME2[Container Runtime<br/>containerd/CRI-O]
+                        POD3[Pod 3<br/>App Container]
+                        POD4[Pod 4<br/>App Container]
+                    end
+                    
+                    subgraph "Worker Node N"
+                        KUBELETN[kubelet<br/>Node Agent]
+                        PROXYN[kube-proxy<br/>Network Proxy]
+                        RUNTIMEN[Container Runtime<br/>containerd/CRI-O]
+                        PODN1[Pod N<br/>App Container]
+                    end
+                    
+                    %% Control Plane connections
+                    API --> ETCD
+                    API --> SCHED
+                    API --> CM
+                    API --> CCM
+                    
+                    %% API Server to Worker Nodes
+                    API -.->|API Calls| KUBELET1
+                    API -.->|API Calls| KUBELET2
+                    API -.->|API Calls| KUBELETN
+                    
+                    %% Worker Node internal connections
+                    KUBELET1 --> RUNTIME1
+                    KUBELET2 --> RUNTIME2
+                    KUBELETN --> RUNTIMEN
+                    
+                    RUNTIME1 --> POD1
+                    RUNTIME1 --> POD2
+                    RUNTIME2 --> POD3
+                    RUNTIME2 --> POD4
+                    RUNTIMEN --> PODN1
+                    
+                    %% Network proxy connections
+                    PROXY1 -.->|Network Rules| POD1
+                    PROXY1 -.->|Network Rules| POD2
+                    PROXY2 -.->|Network Rules| POD3
+                    PROXY2 -.->|Network Rules| POD4
+                    PROXYN -.->|Network Rules| PODN1
+                    
+                    %% Styling
+                    classDef controlPlane fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+                    classDef workerNode fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+                    classDef pod fill:#e8f5e8,stroke:#2e7d32,stroke-width:1px
+                    
+                    class API,ETCD,SCHED,CM,CCM controlPlane
+                    class KUBELET1,PROXY1,RUNTIME1,KUBELET2,PROXY2,RUNTIME2,KUBELETN,PROXYN,RUNTIMEN workerNode
+                    class POD1,POD2,POD3,POD4,PODN1 pod
             </div>
 
             <h2>🔧 Architecture Components Explained</h2>
@@ -371,6 +372,112 @@
                 </ul>
             </div>
 
+            <h2>🔧 Installation Steps</h2>
+            
+            <div class="component-box">
+                <h3>🚀 Step 1: Install Prerequisites</h3>
+                <p>First, update your system and install required packages:</p>
+                <pre><code>sudo apt update
+sudo apt install -y curl wget apt-transport-https ca-certificates gnupg lsb-release</code></pre>
+                <p><strong>Expected Output:</strong> System packages will be updated and required dependencies installed.</p>
+            </div>
+
+            <div class="component-box">
+                <h3>📦 Step 2: Install kubectl</h3>
+                <p>Download and install the latest version of kubectl:</p>
+                <pre><code>curl -LO "https://dl.k8s.io/release/$(curl -Ls https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+kubectl version --client</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>Client Version: v1.33.2
+Kustomize Version: v5.6.0</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>🐳 Step 3: Install Minikube</h3>
+                <p>Download and install Minikube:</p>
+                <pre><code>curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+sudo install minikube-linux-amd64 /usr/local/bin/minikube
+minikube version</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>minikube version: v1.36.0
+commit: f8f52f5de11fc6ad8244afac475e1d0f96841df1-dirty</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>🐋 Step 4: Install Docker</h3>
+                <p>Install Docker and configure user permissions:</p>
+                <pre><code>sudo apt install -y docker.io
+sudo usermod -aG docker $USER
+newgrp docker</code></pre>
+                <p><strong>Verify Docker Installation:</strong></p>
+                <pre><code>docker --version
+docker ps</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>Docker version 27.5.1, build 27.5.1-0ubuntu3
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>🚀 Step 5: Start Minikube Cluster</h3>
+                <p>Start your local Kubernetes cluster:</p>
+                <pre><code>minikube start --driver=docker</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>😄  minikube v1.36.0 on Ubuntu 25.04
+✨  Using the docker driver based on user configuration
+📌  Using Docker driver with root privileges
+👍  Starting "minikube" primary control-plane node in "minikube" cluster
+🚜  Pulling base image v0.0.47 ...
+💾  Downloading Kubernetes v1.33.1 preload ...
+    > preloaded-images-k8s-v18-v1...:  347.04 MiB / 347.04 MiB  100.00% 14.39 M
+    > gcr.io/k8s-minikube/kicbase...:  502.26 MiB / 502.26 MiB  100.00% 9.31 Mi
+🔥  Creating docker container (CPUs=2, Memory=3800MB) ...
+🐳  Preparing Kubernetes v1.33.1 on Docker 28.1.1 ...
+    ▪ Generating certificates and keys ...
+    ▪ Booting up control plane ...
+    ▪ Configuring RBAC rules ...
+🔗  Configuring bridge CNI (Container Networking Interface) ...
+🔎  Verifying Kubernetes components...
+    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
+🌟  Enabled addons: storage-provisioner, default-storageclass
+🏄  Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>✅ Step 6: Verify Installation</h3>
+                <p>Verify that everything is working correctly:</p>
+                <pre><code>kubectl cluster-info
+kubectl get nodes
+kubectl get pods --all-namespaces</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>Kubernetes control plane is running at https://127.0.0.1:32768
+CoreDNS is running at https://127.0.0.1:32768/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+NAME       STATUS   ROLES           AGE   VERSION
+minikube   Ready    control-plane   2m    v1.33.1
+
+NAMESPACE     NAME                               READY   STATUS    RESTARTS   AGE
+kube-system   coredns-787d4945fb-2k4vx          1/1     Running   0          2m
+kube-system   etcd-minikube                      1/1     Running   0          2m
+kube-system   kube-apiserver-minikube            1/1     Running   0          2m
+kube-system   kube-controller-manager-minikube   1/1     Running   0          2m
+kube-system   kube-proxy-2k4vx                   1/1     Running   0          2m
+kube-system   kube-scheduler-minikube            1/1     Running   0          2m
+kube-system   storage-provisioner                1/1     Running   0          2m</code></pre>
+            </div>
+
+            <div class="goal-box">
+                <h3>🎯 Next Steps</h3>
+                <p>Now that you have a working Kubernetes cluster, you can:</p>
+                <ul class="task-list">
+                    <li>Deploy your first application</li>
+                    <li>Explore kubectl commands</li>
+                    <li>Learn about pods, services, and deployments</li>
+                    <li>Practice with the Nginx example</li>
+                </ul>
+            </div>
+
             <h2>📚 Resources</h2>
             <ul>
                 <li><a href="https://kubernetes.io/docs/" target="_blank">Kubernetes Official Documentation</a></li>
@@ -386,5 +493,17 @@
             </div>
         </div>
     </div>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true
+            }
+        });
+    </script>
 </body>
 </html> 
