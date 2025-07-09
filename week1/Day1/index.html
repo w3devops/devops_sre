@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1 Day 1: Kubernetes Basics - DevOps/SRE Learning Portfolio</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h1, h2, h3 {
+            color: #667eea;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .goal-box {
+            background: #e8f5e8;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .task-list li:before {
+            content: "📋";
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .component-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .component-box h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        .mermaid {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .nav-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .flow-steps {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+        }
+
+        .flow-steps li {
+            counter-increment: step-counter;
+            padding: 15px 0;
+            border-bottom: 1px solid #e1e4e8;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .flow-steps li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 15px;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐳 Week 1: Kubernetes, Docker, Networking, and Security</h1>
+            <p>Day 1: Kubernetes Basics - Building a strong foundation</p>
+        </div>
+
+        <div class="breadcrumb">
+            <a href="../../index.html">Home</a> > 
+            <a href="../../documentation.html">Documentation</a> > 
+            <a href="../README.md">Week 1</a> > 
+            Day 1: Kubernetes Basics
+        </div>
+
+        <div class="content">
+            <h1>Day 1: Kubernetes Basics (6 hours)</h1>
+            
+            <div class="goal-box">
+                <h3>🎯 Goal</h3>
+                <p>Build a strong foundation in Kubernetes, Docker, scripting, and security basics.</p>
+            </div>
+
+            <h2>📚 Learning Objectives</h2>
+            <ul class="task-list">
+                <li>Learn: Kubernetes architecture (control plane, nodes, pods, services, deployments)</li>
+                <li>Resources: Kubernetes docs (kubernetes.io), FreeCodeCamp Kubernetes course (freecodecamp.org)</li>
+                <li>Practice: Install Minikube/Kind, deploy an Nginx pod using kubectl apply -f, expose it as a service, and access it</li>
+                <li>Task: Document kubectl commands in your README</li>
+            </ul>
+
+            <h2>🏗️ Kubernetes Architecture</h2>
+            <p>A Kubernetes cluster consists of two main types of components: the <strong>Control Plane</strong> and the <strong>Worker Nodes</strong>.</p>
+
+            <div class="component-box">
+                <h3>🎛️ Control Plane</h3>
+                <p>The Control Plane is the brain of the cluster. It manages the overall state of the applications and the cluster itself. Its core components are:</p>
+                
+                <ul>
+                    <li><strong>kube-apiserver:</strong> The entry point for all cluster communication. It exposes the Kubernetes API.</li>
+                    <li><strong>etcd:</strong> A consistent and highly-available key-value store that acts as the single source of truth for all cluster data.</li>
+                    <li><strong>kube-scheduler:</strong> Watches for newly created Pods and assigns them to a healthy Worker Node based on resource requirements and other constraints.</li>
+                    <li><strong>kube-controller-manager:</strong> Runs various controller processes that regulate the state of the cluster, ensuring the current state matches the desired state.</li>
+                    <li><strong>cloud-controller-manager:</strong> (Optional) Integrates with the underlying cloud provider's infrastructure for features like load balancers and storage.</li>
+                </ul>
+            </div>
+
+            <div class="component-box">
+                <h3>🖥️ Worker Nodes</h3>
+                <p>Worker Nodes are the machines (virtual or physical) where your containerized applications run. Each worker node contains:</p>
+                
+                <ul>
+                    <li><strong>kubelet:</strong> An agent that runs on each node. It communicates with the Control Plane to ensure containers are running in a Pod as specified.</li>
+                    <li><strong>kube-proxy:</strong> A network proxy that runs on each node, maintaining network rules and enabling communication to your Pods from inside or outside the cluster.</li>
+                    <li><strong>Container Runtime:</strong> The software responsible for running containers. Kubernetes supports runtimes like containerd and CRI-O (and formerly Docker).</li>
+                </ul>
+            </div>
+
+            <h2>📊 Kubernetes Architecture Diagram</h2>
+            
+            <div class="mermaid">
+                <pre><code>graph TB
+    subgraph "Control Plane"
+        API[kube-apiserver&lt;br/&gt;API Server]
+        ETCD[etcd&lt;br/&gt;Key-Value Store]
+        SCHED[kube-scheduler&lt;br/&gt;Scheduler]
+        CM[kube-controller-manager&lt;br/&gt;Controller Manager]
+        CCM[cloud-controller-manager&lt;br/&gt;Cloud Controller]
+    end
+    
+    subgraph "Worker Node 1"
+        KUBELET1[kubelet&lt;br/&gt;Node Agent]
+        PROXY1[kube-proxy&lt;br/&gt;Network Proxy]
+        RUNTIME1[Container Runtime&lt;br/&gt;containerd/CRI-O]
+        POD1[Pod 1&lt;br/&gt;App Container]
+        POD2[Pod 2&lt;br/&gt;App Container]
+    end
+    
+    subgraph "Worker Node 2"
+        KUBELET2[kubelet&lt;br/&gt;Node Agent]
+        PROXY2[kube-proxy&lt;br/&gt;Network Proxy]
+        RUNTIME2[Container Runtime&lt;br/&gt;containerd/CRI-O]
+        POD3[Pod 3&lt;br/&gt;App Container]
+        POD4[Pod 4&lt;br/&gt;App Container]
+    end
+    
+    subgraph "Worker Node N"
+        KUBELETN[kubelet&lt;br/&gt;Node Agent]
+        PROXYN[kube-proxy&lt;br/&gt;Network Proxy]
+        RUNTIMEN[Container Runtime&lt;br/&gt;containerd/CRI-O]
+        PODN1[Pod N&lt;br/&gt;App Container]
+    end
+    
+    %% Control Plane connections
+    API --> ETCD
+    API --> SCHED
+    API --> CM
+    API --> CCM
+    
+    %% API Server to Worker Nodes
+    API -.->|API Calls| KUBELET1
+    API -.->|API Calls| KUBELET2
+    API -.->|API Calls| KUBELETN
+    
+    %% Worker Node internal connections
+    KUBELET1 --> RUNTIME1
+    KUBELET2 --> RUNTIME2
+    KUBELETN --> RUNTIMEN
+    
+    RUNTIME1 --> POD1
+    RUNTIME1 --> POD2
+    RUNTIME2 --> POD3
+    RUNTIME2 --> POD4
+    RUNTIMEN --> PODN1
+    
+    %% Network proxy connections
+    PROXY1 -.->|Network Rules| POD1
+    PROXY1 -.->|Network Rules| POD2
+    PROXY2 -.->|Network Rules| POD3
+    PROXY2 -.->|Network Rules| POD4
+    PROXYN -.->|Network Rules| PODN1
+    
+    %% Styling
+    classDef controlPlane fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef workerNode fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef pod fill:#e8f5e8,stroke:#2e7d32,stroke-width:1px
+    
+    class API,ETCD,SCHED,CM,CCM controlPlane
+    class KUBELET1,PROXY1,RUNTIME1,KUBELET2,PROXY2,RUNTIME2,KUBELETN,PROXYN,RUNTIMEN workerNode
+    class POD1,POD2,POD3,POD4,PODN1 pod</code></pre>
+            </div>
+
+            <h2>🔧 Architecture Components Explained</h2>
+
+            <div class="component-box">
+                <h3>🎛️ Control Plane Components</h3>
+                <ul>
+                    <li><strong>kube-apiserver:</strong> Central API server that all components communicate with</li>
+                    <li><strong>etcd:</strong> Distributed key-value store for cluster state</li>
+                    <li><strong>kube-scheduler:</strong> Assigns pods to nodes based on constraints</li>
+                    <li><strong>kube-controller-manager:</strong> Runs controllers for different resources</li>
+                    <li><strong>cloud-controller-manager:</strong> Integrates with cloud provider APIs</li>
+                </ul>
+            </div>
+
+            <div class="component-box">
+                <h3>🖥️ Worker Node Components</h3>
+                <ul>
+                    <li><strong>kubelet:</strong> Primary node agent that manages pod lifecycle</li>
+                    <li><strong>kube-proxy:</strong> Network proxy for pod-to-pod communication</li>
+                    <li><strong>Container Runtime:</strong> Software that runs containers (containerd, CRI-O)</li>
+                </ul>
+            </div>
+
+            <h2>🔄 Communication Flow</h2>
+            <ol class="flow-steps">
+                <li><strong>API Server</strong> is the central hub for all cluster communication</li>
+                <li><strong>etcd</strong> stores the cluster state and configuration</li>
+                <li><strong>Scheduler</strong> watches for new pods and assigns them to nodes</li>
+                <li><strong>kubelet</strong> on each node receives pod specifications and manages containers</li>
+                <li><strong>kube-proxy</strong> handles networking between pods and services</li>
+            </ol>
+
+            <h2>📝 Daily Tasks</h2>
+            <div class="goal-box">
+                <h3>✅ Today's Checklist</h3>
+                <ul class="task-list">
+                    <li>Install Minikube or Kind on your local machine</li>
+                    <li>Deploy an Nginx pod using kubectl apply -f</li>
+                    <li>Expose the pod as a service</li>
+                    <li>Access the service from your browser</li>
+                    <li>Document all kubectl commands used</li>
+                    <li>Practice basic kubectl commands (get, describe, logs)</li>
+                </ul>
+            </div>
+
+            <h2>📚 Resources</h2>
+            <ul>
+                <li><a href="https://kubernetes.io/docs/" target="_blank">Kubernetes Official Documentation</a></li>
+                <li><a href="https://www.freecodecamp.org/news/learn-kubernetes-in-under-3-hours/" target="_blank">FreeCodeCamp Kubernetes Course</a></li>
+                <li><a href="https://minikube.sigs.k8s.io/docs/" target="_blank">Minikube Documentation</a></li>
+                <li><a href="https://kind.sigs.k8s.io/" target="_blank">Kind Documentation</a></li>
+            </ul>
+
+            <div class="nav-buttons">
+                <a href="../../index.html" class="btn">← Back to Home</a>
+                <a href="../../documentation.html" class="btn">← Back to Documentation</a>
+                <a href="../README.md" class="btn">← Back to Week 1</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
