@@ -1,0 +1,176 @@
+---
+# Flux GitRepository source
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: myapp-manifests
+  namespace: flux-system
+spec:
+  interval: 1m
+  url: https://github.com/myorg/k8s-manifests
+  ref:
+    branch: main
+  secretRef:
+    name: github-credentials
+
+---
+# Flux Kustomization for production
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: myapp-production
+  namespace: flux-system
+spec:
+  interval: 10m
+  retryInterval: 2m
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: myapp-manifests
+  path: ./k8s/overlays/production
+  prune: true
+  validation: client
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: myapp
+    namespace: production
+  - apiVersion: v1
+    kind: Service
+    name: myapp
+    namespace: production
+  targetNamespace: production
+
+---
+# Flux Kustomization for staging
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: myapp-staging
+  namespace: flux-system
+spec:
+  interval: 5m
+  retryInterval: 1m
+  timeout: 3m
+  sourceRef:
+    kind: GitRepository
+    name: myapp-manifests
+  path: ./k8s/overlays/staging
+  prune: true
+  validation: client
+  healthChecks:
+  - apiVersion: apps/v1
+    kind: Deployment
+    name: myapp
+    namespace: staging
+  targetNamespace: staging
+
+---
+# Flux ImageRepository for automated updates
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: myapp-images
+  namespace: flux-system
+spec:
+  interval: 5m
+  image: ghcr.io/myorg/myapp
+  secretRef:
+    name: registry-credentials
+
+---
+# Flux ImagePolicy for version selection
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: myapp-policy
+  namespace: flux-system
+spec:
+  imageRepositoryRef:
+    name: myapp-images
+  filterTags:
+    pattern: '^v(?P<version>.*)$'
+    extract: '$version'
+  policy:
+    semver:
+      range: '>=1.0.0'
+
+---
+# Flux ImageUpdateAutomation for automated updates
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImageUpdateAutomation
+metadata:
+  name: myapp-updates
+  namespace: flux-system
+spec:
+  interval: 15m
+  sourceRef:
+    kind: GitRepository
+    name: myapp-manifests
+  git:
+    checkout:
+      ref:
+        branch: main
+    commit:
+      author:
+        email: fluxcdbot@users.noreply.github.com
+        name: fluxcdbot
+      messageTemplate: |
+        Automated image update for {{range .Updated.Images}}{{.}}{{end}}
+
+        Updated image(s) to {{range .Updated.Images}}{{.}}{{end}}
+    push:
+      branch: main
+  update:
+    path: ./k8s/overlays/production
+    strategy: Setters
+
+---
+# Flux Alert for notification on failures
+apiVersion: notification.toolkit.fluxcd.io/v1beta2
+kind: Alert
+metadata:
+  name: myapp-alerts
+  namespace: flux-system
+spec:
+  providerRef:
+    name: slack-provider
+  eventSeverity: error
+  eventSources:
+  - kind: Kustomization
+    name: myapp-production
+  - kind: Kustomization
+    name: myapp-staging
+
+---
+# Flux Provider for Slack notifications
+apiVersion: notification.toolkit.fluxcd.io/v1beta2
+kind: Provider
+metadata:
+  name: slack-provider
+  namespace: flux-system
+spec:
+  type: slack
+  channel: devops-alerts
+  secretRef:
+    name: slack-webhook-url
+
+---
+# Flux Receiver for external triggers
+apiVersion: notification.toolkit.fluxcd.io/v1beta2
+kind: Receiver
+metadata:
+  name: myapp-webhook
+  namespace: flux-system
+spec:
+  type: generic
+  events:
+  - deploy-staging
+  - deploy-production
+  resources:
+  - kind: Kustomization
+    name: myapp-staging
+  - kind: Kustomization
+    name: myapp-production
+  secretRef:
+    name: webhook-secret

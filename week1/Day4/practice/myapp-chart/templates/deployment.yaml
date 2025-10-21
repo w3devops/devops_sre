@@ -1,0 +1,169 @@
+{{- if .Values.rbac.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "myapp-chart.serviceAccountName" . }}
+  labels:
+    {{- include "myapp-chart.labels" . | nindent 4 }}
+  annotations:
+    {{- with .Values.serviceAccount.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+automountServiceAccountToken: false
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "myapp-chart.fullname" . }}-role
+  labels:
+    {{- include "myapp-chart.labels" . | nindent 4 }}
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "myapp-chart.fullname" . }}-binding
+  labels:
+    {{- include "myapp-chart.labels" . | nindent 4 }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "myapp-chart.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: Role
+  name: {{ include "myapp-chart.fullname" . }}-role
+  apiGroup: rbac.authorization.k8s.io
+{{- end }}
+
+{{- if .Values.configmap.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "myapp-chart.fullname" . }}-config
+  labels:
+    {{- include "myapp-chart.labels" . | nindent 4 }}
+data:
+  {{- range $key, $value := .Values.configmap.data }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
+
+{{- if .Values.secret.enabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "myapp-chart.fullname" . }}-secret
+  labels:
+    {{- include "myapp-chart.labels" . | nindent 4 }}
+type: Opaque
+data:
+  {{- range $key, $value := .Values.secret.data }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "myapp-chart.fullname" . }}
+  labels:
+    {{- include "myapp-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "myapp-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "myapp-chart.selectorLabels" . | nindent 8 }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      {{- if .Values.serviceAccount.create }}
+      serviceAccountName: {{ include "myapp-chart.serviceAccountName" . }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.configmap.enabled }}
+      volumes:
+      - name: config-volume
+        configMap:
+          name: {{ include "myapp-chart.fullname" . }}-config
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          env:
+            {{- if .Values.configmap.enabled }}
+            - name: APP_CONFIG
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ include "myapp-chart.fullname" . }}-config
+                  key: APP_ENV
+            {{- end }}
+            {{- if .Values.secret.enabled }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "myapp-chart.fullname" . }}-secret
+                  key: DATABASE_PASSWORD
+            {{- end }}
+            {{- with .Values.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.configmap.enabled }}
+          volumeMounts:
+          - name: config-volume
+            mountPath: /app/config
+            readOnly: true
+          {{- end }}
+          {{- with .Values.volumeMounts }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          livenessProbe:
+            {{- if .Values.livenessProbe.enabled }}
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+            {{- end }}
+          readinessProbe:
+            {{- if .Values.readinessProbe.enabled }}
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+            {{- end }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sidecars }}
+      containers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

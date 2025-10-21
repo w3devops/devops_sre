@@ -1,0 +1,246 @@
+---
+# Kubecost configuration for cost monitoring
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubecost
+  labels:
+    name: kubecost
+
+---
+# Kubecost installation
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: kubecost
+  namespace: kubecost
+spec:
+  chart: cost-analyzer
+  repo: https://kubecost.github.io/cost-analyzer/
+  targetNamespace: kubecost
+  valuesContent: |
+    kubecostProductConfigs:
+      clusterName: production-cluster
+      productKey: "${KUBECOST_TOKEN}"
+
+    global:
+      prometheus:
+        enabled: false
+        fqdn: http://prometheus-operated.monitoring.svc.cluster.local:9090
+
+    prometheus:
+      server:
+        global:
+          scrape_interval: 1m
+          scrape_timeout: 10s
+        extraFlags:
+          - web.enable-lifecycle
+          - web.enable-admin-api
+
+    grafana:
+      sidecar:
+        dashboards:
+          enabled: true
+          searchNamespace: ALL
+
+    networkPolicies:
+      enabled: true
+
+    podSecurityPolicy:
+      enabled: false
+
+    serviceAccount:
+      create: true
+      annotations:
+        iam.amazonaws.com/role: kubecost-cost-monitoring
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+
+---
+# Goldilocks for resource recommendations
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: goldilocks
+  namespace: goldilocks
+spec:
+  chart: goldilocks
+  repo: https://charts.fairwinds.com/stable
+  targetNamespace: goldilocks
+  valuesContent: |
+    installation:
+      vpa:
+        enabled: true
+
+    dashboard:
+      enabled: true
+      replicaCount: 1
+
+    controller:
+      enabled: true
+      replicaCount: 1
+      resources:
+        requests:
+          cpu: 50m
+          memory: 128Mi
+        limits:
+          cpu: 200m
+          memory: 256Mi
+
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+
+---
+# Resource optimization policies
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: resource-optimization-policies
+  namespace: default
+data:
+  policies.yaml: |
+    policies:
+      - name: "cpu-optimization"
+        description: "Optimize CPU requests based on usage"
+        rules:
+          - type: "container"
+            condition: "cpu_usage < 20%"
+            action: "reduce_cpu_request"
+            parameters:
+              reduction_factor: 0.5
+              min_cpu: "10m"
+
+      - name: "memory-optimization"
+        description: "Optimize memory requests based on usage"
+        rules:
+          - type: "container"
+            condition: "memory_usage < 30%"
+            action: "reduce_memory_request"
+            parameters:
+              reduction_factor: 0.7
+              min_memory: "32Mi"
+
+      - name: "over-provisioned-cleanup"
+        description: "Identify and flag over-provisioned resources"
+        rules:
+          - type: "deployment"
+            condition: "replicas_unused > 50%"
+            action: "recommend_scaling"
+            parameters:
+              scaling_factor: 0.5
+
+---
+# Cost monitoring alerts
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cost-optimization-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: cost-optimization
+    rules:
+    - alert: HighCostResource
+      expr: kubecost_resource_cpu_allocation > 0.8
+      for: 10m
+      labels:
+        severity: warning
+        category: cost
+      annotations:
+        summary: "High cost resource detected"
+        description: "Resource {{ $labels.resource }} in namespace {{ $labels.namespace }} has high cost allocation"
+
+    - alert: UnusedResources
+      expr: kubecost_resource_cpu_allocation == 0
+      for: 1h
+      labels:
+        severity: info
+        category: cost
+      annotations:
+        summary: "Unused resources detected"
+        description: "Resource {{ $labels.resource }} in namespace {{ $labels.namespace }} appears unused"
+
+    - alert: CostSpike
+      expr: increase(kubecost_cluster_cost_total[1h]) > 50
+      for: 5m
+      labels:
+        severity: warning
+        category: cost
+      annotations:
+        summary: "Cost spike detected"
+        description: "Cluster cost increased by more than 50% in the last hour"
+
+---
+# Automated cost optimization
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cost-optimizer
+  namespace: default
+spec:
+  schedule: "0 9 * * 1"  # Every Monday at 9 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: cost-optimizer
+          containers:
+          - name: cost-optimizer
+            image: kubecost/cost-optimizer:latest
+            env:
+            - name: CLUSTER_NAME
+              value: "production-cluster"
+            - name: OPTIMIZATION_THRESHOLD
+              value: "0.7"
+            - name: DRY_RUN
+              value: "true"
+          restartPolicy: OnFailure
+
+---
+# Service account for cost optimization
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cost-optimizer
+  namespace: default
+
+---
+# RBAC for cost optimizer
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cost-optimizer-role
+  namespace: default
+rules:
+- apiGroups: [""]
+  resources: ["pods", "deployments", "services"]
+  verbs: ["get", "list", "patch"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "patch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cost-optimizer-binding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: cost-optimizer
+  namespace: default
+roleRef:
+  kind: Role
+  name: cost-optimizer-role
+  apiGroup: rbac.authorization.k8s.io

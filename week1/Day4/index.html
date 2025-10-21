@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1 Day 4: Security, Monitoring & Helm - DevOps/SRE Learning Portfolio</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h1, h2, h3 {
+            color: #667eea;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .goal-box {
+            background: #e8f5e8;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .task-list li:before {
+            content: "🔒";
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .component-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .component-box h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        .mermaid {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .nav-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .flow-steps {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+        }
+
+        .flow-steps li {
+            counter-increment: step-counter;
+            padding: 15px 0;
+            border-bottom: 1px solid #e1e4e8;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .flow-steps li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 15px;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-block .comment {
+            color: #a0aec0;
+        }
+
+        .code-block .keyword {
+            color: #9f7aea;
+        }
+
+        .code-block .string {
+            color: #68d391;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .mermaid {
+                padding: 10px;
+                margin: 15px 0;
+            }
+
+            .mermaid svg {
+                transform: scale(0.8);
+                transform-origin: top left;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mermaid svg {
+                transform: scale(0.6);
+                transform-origin: top left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐳 Week 1: Kubernetes, Docker, Networking, and Security</h1>
+            <p>Day 4: Security, Monitoring, and Package Management with Helm</p>
+        </div>
+
+        <div class="breadcrumb">
+            <a href="../../index.html">Home</a> >
+            <a href="../../documentation.html">Documentation</a> >
+            <a href="../README.html">Week 1</a> >
+            Day 4: Security & Monitoring
+        </div>
+
+        <div class="content">
+            <h1>Day 4: Security, Monitoring, and Package Management with Helm (6 hours)</h1>
+
+            <div class="goal-box">
+                <h3>🎯 Goal</h3>
+                <p>Master Kubernetes security practices, implement monitoring solutions, and learn package management with Helm.</p>
+            </div>
+
+            <h2>📚 Learning Objectives</h2>
+            <ul class="task-list">
+                <li>Learn: RBAC, Network Policies, and Pod Security Standards</li>
+                <li>Practice: Set up monitoring with Prometheus and Grafana</li>
+                <li>Task: Implement comprehensive security policies</li>
+                <li>Master: Helm charts for application packaging and deployment</li>
+                <li>Resources: Security best practices and monitoring guides</li>
+            </ul>
+
+            <h2>🔐 Kubernetes Security Architecture</h2>
+            <p>Kubernetes security is implemented through multiple layers: Authentication, Authorization (RBAC), Network Policies, and Pod Security Standards.</p>
+
+            <div class="component-box">
+                <h3>🛡️ Security Layers</h3>
+                <ul>
+                    <li><strong>Authentication:</strong> Verify identity of users and service accounts</li>
+                    <li><strong>Authorization (RBAC):</strong> Control what authenticated users can do</li>
+                    <li><strong>Network Policies:</strong> Control traffic between pods and services</li>
+                    <li><strong>Pod Security:</strong> Restrict pod privileges and capabilities</li>
+                    <li><strong>Image Security:</strong> Scan and verify container images</li>
+                </ul>
+            </div>
+
+            <h2>👥 RBAC (Role-Based Access Control)</h2>
+
+            <div class="component-box">
+                <h3>📝 Step 1: Create Service Account</h3>
+                <p>Create a service account for application pods:</p>
+
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">v1</span>
+<span class="keyword">kind</span>: <span class="string">ServiceAccount</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">app-service-account</span>
+  <span class="keyword">namespace</span>: <span class="string">production</span>
+</div>
+
+                <h4>Apply the service account:</h4>
+                <pre><code>kubectl apply -f practice/service-account.yaml</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>🔐 Step 2: Create Role and RoleBinding</h3>
+                <p>Create a role with specific permissions:</p>
+
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">rbac.authorization.k8s.io/v1</span>
+<span class="keyword">kind</span>: <span class="string">Role</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">pod-reader</span>
+  <span class="keyword">namespace</span>: <span class="string">production</span>
+<span class="keyword">rules</span>:
+- <span class="keyword">apiGroups</span>: [<span class="string">""</span>]
+  <span class="keyword">resources</span>: [<span class="string">"pods"</span>]
+  <span class="keyword">verbs</span>: [<span class="string">"get"</span>, <span class="string">"list"</span>, <span class="string">"watch"</span>]
+- <span class="keyword">apiGroups</span>: [<span class="string">""</span>]
+  <span class="keyword">resources</span>: [<span class="string">"pods/log"</span>]
+  <span class="keyword">verbs</span>: [<span class="string">"get"</span>]
+</div>
+
+                <h4>Create RoleBinding:</h4>
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">rbac.authorization.k8s.io/v1</span>
+<span class="keyword">kind</span>: <span class="string">RoleBinding</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">read-pods</span>
+  <span class="keyword">namespace</span>: <span class="string">production</span>
+<span class="keyword">subjects</span>:
+- <span class="keyword">kind</span>: <span class="string">ServiceAccount</span>
+  <span class="keyword">name</span>: <span class="string">app-service-account</span>
+  <span class="keyword">namespace</span>: <span class="string">production</span>
+<span class="keyword">roleRef</span>:
+  <span class="keyword">kind</span>: <span class="string">Role</span>
+  <span class="keyword">name</span>: <span class="string">pod-reader</span>
+  <span class="keyword">apiGroup</span>: <span class="string">rbac.authorization.k8s.io</span>
+</div>
+            </div>
+
+            <h2>📊 Monitoring Architecture</h2>
+
+            <div class="mermaid">
+                graph TB
+                    subgraph "Monitoring Stack"
+                        PROM[Prometheus<br/>Metrics Collection]
+                        GRAF[Grafana<br/>Visualization]
+                        ALERT[AlertManager<br/>Alerting]
+                        KUBE[Kube State Metrics<br/>Cluster Metrics]
+                        CADV[cAdvisor<br/>Container Metrics]
+                        NODE[Node Exporter<br/>Node Metrics]
+                    end
+
+                    KUBE --> PROM
+                    CADV --> PROM
+                    NODE --> PROM
+                    PROM --> GRAF
+                    PROM --> ALERT
+
+                    %% Styling
+                    classDef monitoring fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+                    classDef metrics fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+                    classDef visualization fill:#e8f5e8,stroke:#2e7d32,stroke-width:1px
+
+                    class PROM,ALERT monitoring
+                    class KUBE,CADV,NODE metrics
+                    class GRAF visualization
+            </div>
+
+            <h2>🚀 Hands-On Practice: Monitoring</h2>
+
+            <div class="component-box">
+                <h3>📈 Step 3: Install Prometheus</h3>
+                <p>Install Prometheus using Helm:</p>
+
+                <h4>Add Helm repositories:</h4>
+                <pre><code>helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update</code></pre>
+
+                <h4>Install Prometheus stack:</h4>
+                <pre><code>helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring --create-namespace</code></pre>
+
+                <h4>Verify installation:</h4>
+                <pre><code>kubectl get pods -n monitoring</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>📊 Step 4: Access Grafana Dashboard</h4>
+                <p>Access Grafana to visualize metrics:</p>
+
+                <h4>Port forward to Grafana:</h4>
+                <pre><code>kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80</code></pre>
+
+                <h4>Default credentials:</h4>
+                <pre><code>Username: admin
+Password: prom-operator</code></pre>
+
+                <h4>Verify dashboards:</h4>
+                <pre><code># Check available dashboards
+kubectl get grafanadashboards -n monitoring</code></pre>
+            </div>
+
+            <h2>🧙 Helm Package Management</h2>
+
+            <div class="component-box">
+                <h3>📦 Step 5: Install Helm</h3>
+                <p>Install Helm on your local machine:</p>
+
+                <h4>Download and install Helm:</h4>
+                <pre><code>curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh</code></pre>
+
+                <h4>Verify installation:</h4>
+                <pre><code>helm version</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>📋 Step 6: Create Your First Chart</h3>
+                <p>Create a Helm chart for your application:</p>
+
+                <h4>Create new chart:</h4>
+                <pre><code>helm create myapp-chart</code></pre>
+
+                <h4>Examine chart structure:</h4>
+                <pre><code>tree myapp-chart/</code></pre>
+
+                <h4>Install the chart:</h4>
+                <pre><code>helm install myapp ./myapp-chart</code></pre>
+            </div>
+
+            <h2>🔧 Essential Security Commands</h2>
+
+            <div class="component-box">
+                <h3>👥 RBAC Commands</h3>
+                <pre><code># List service accounts
+kubectl get serviceaccounts
+
+# Describe service account
+kubectl describe serviceaccount app-service-account
+
+# List roles and rolebindings
+kubectl get roles,rolebindings
+
+# Check RBAC permissions
+kubectl auth can-i get pods --as=system:serviceaccount:production:app-service-account</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>🔍 Security Auditing</h3>
+                <pre><code># Check pod security context
+kubectl get pod <pod-name> -o yaml | grep -A 10 securityContext
+
+# List network policies
+kubectl get networkpolicies
+
+# Check for privileged containers
+kubectl get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.containers[*].securityContext.privileged}{"\n"}{end}'
+
+# Audit cluster roles
+kubectl get clusterroles -o wide</code></pre>
+            </div>
+
+            <h2>📊 Monitoring Commands</h2>
+
+            <div class="component-box">
+                <h3>📈 Metrics Commands</h3>
+                <pre><code># Get Prometheus metrics
+kubectl port-forward -n monitoring svc/prometheus-operated 9090:9090
+curl http://localhost:9090/api/v1/query?query=up
+
+# Check Grafana dashboards
+kubectl get grafanadashboards -n monitoring
+
+# View application metrics
+kubectl top pods
+kubectl top nodes
+
+# Check resource quotas
+kubectl describe resourcequota</code></pre>
+            </div>
+
+            <h2>🧙 Helm Commands</h2>
+
+            <div class="component-box">
+                <h3>📦 Package Management</h3>
+                <pre><code># List installed releases
+helm list -A
+
+# Upgrade a release
+helm upgrade myapp ./myapp-chart
+
+# Rollback a release
+helm rollback myapp 1
+
+# Uninstall a release
+helm uninstall myapp
+
+# View release status
+helm status myapp</code></pre>
+            </div>
+
+            <h2>📚 Daily Tasks</h2>
+            <div class="goal-box">
+                <h3>✅ Today's Checklist</h3>
+                <ul class="task-list">
+                    <li>Implement RBAC with Service Accounts, Roles, and RoleBindings</li>
+                    <li>Create and apply Network Policies for traffic control</li>
+                    <li>Set up Prometheus and Grafana monitoring stack</li>
+                    <li>Configure Pod Security Standards</li>
+                    <li>Install and use Helm for package management</li>
+                    <li>Create and deploy your first Helm chart</li>
+                    <li>Practice security auditing and monitoring queries</li>
+                </ul>
+            </div>
+
+            <h2>🎯 Best Practices</h2>
+            <div class="component-box">
+                <h3>🔐 Security Best Practices</h3>
+                <ul>
+                    <li><strong>Least Privilege:</strong> Grant minimum required permissions</li>
+                    <li><strong>Service Accounts:</strong> Use dedicated service accounts for applications</li>
+                    <li><strong>Network Policies:</strong> Implement default deny policies</li>
+                    <li><strong>Pod Security:</strong> Run containers as non-root users</li>
+                    <li><strong>Image Scanning:</strong> Scan images for vulnerabilities</li>
+                </ul>
+            </div>
+
+            <div class="component-box">
+                <h3>📊 Monitoring Best Practices</h3>
+                <ul>
+                    <li><strong>Resource Metrics:</strong> Monitor CPU, memory, and storage usage</li>
+                    <li><strong>Application Metrics:</strong> Instrument applications with custom metrics</li>
+                    <li><strong>Alerting:</strong> Set up meaningful alerts with proper thresholds</li>
+                    <li><strong>Dashboards:</strong> Create dashboards for different audiences</li>
+                    <li><strong>Log Aggregation:</strong> Centralize and analyze application logs</li>
+                </ul>
+            </div>
+
+            <h2>📚 Resources</h2>
+            <ul>
+                <li><a href="https://kubernetes.io/docs/reference/access-authn-authz/rbac/" target="_blank">RBAC Documentation</a></li>
+                <li><a href="https://kubernetes.io/docs/concepts/services-networking/network-policies/" target="_blank">Network Policies Guide</a></li>
+                <li><a href="https://prometheus.io/docs/introduction/overview/" target="_blank">Prometheus Documentation</a></li>
+                <li><a href="https://helm.sh/docs/" target="_blank">Helm Documentation</a></li>
+            </ul>
+
+            <div class="nav-buttons">
+                <a href="../../index.html" class="btn">← Back to Home</a>
+                <a href="../../documentation.html" class="btn">← Back to Documentation</a>
+                <a href="../README.html" class="btn">← Back to Week 1</a>
+                <a href="practice/" class="btn">🚀 Practice Exercises</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Mermaid with mobile-friendly settings
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            responsive: true
+        });
+
+        // Handle mobile viewport
+        function adjustMermaidForMobile() {
+            const mermaidDivs = document.querySelectorAll('.mermaid');
+            mermaidDivs.forEach(div => {
+                const svg = div.querySelector('svg');
+                if (svg && window.innerWidth <= 768) {
+                    svg.style.maxWidth = '100%';
+                    svg.style.height = 'auto';
+                }
+            });
+        }
+
+        // Adjust on load and resize
+        window.addEventListener('load', adjustMermaidForMobile);
+        window.addEventListener('resize', adjustMermaidForMobile);
+    </script>
+</body>
+</html>

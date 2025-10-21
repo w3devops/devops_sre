@@ -1,0 +1,57 @@
+---
+# ConfigMap with literal values
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  labels:
+    app: nginx
+data:
+  # Simple key-value pairs
+  database_url: "postgresql://localhost:5432/mydb"
+  redis_host: "redis-service"
+  environment: "production"
+
+---
+# ConfigMap with file content
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  labels:
+    app: nginx
+data:
+  # HTML content for Nginx
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Welcome to My App</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            h1 { color: #667eea; }
+        </style>
+    </head>
+    <body>
+        <h1>Welcome to My Kubernetes App!</h1>
+        <p>This content is served from a Kubernetes ConfigMap.</p>
+        <p>Environment: production</p>
+        <p>Database: postgresql://localhost:5432/mydb</p>
+    </body>
+    </html>
+
+  # Nginx configuration
+  nginx.conf: |
+    events {
+        worker_connections 1024;
+    }
+    http {
+        server {
+            listen 80;
+            server_name localhost;
+            location / {
+                root /usr/share/nginx/html;
+                index index.html;
+            }
+        }
+    }

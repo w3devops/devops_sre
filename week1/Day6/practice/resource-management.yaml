@@ -1,0 +1,174 @@
+---
+# Resource Quota for production namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: production-quota
+  namespace: production
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    persistentvolumeclaims: "10"
+    pods: "20"
+    services: "10"
+    secrets: "20"
+    configmaps: "20"
+    services.loadbalancers: "2"
+    services.nodeports: "5"
+
+---
+# LimitRange for default resource limits
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: resource-limits
+  namespace: production
+spec:
+  limits:
+  - type: Container
+    default:
+      cpu: 100m
+      memory: 128Mi
+    defaultRequest:
+      cpu: 50m
+      memory: 64Mi
+    max:
+      cpu: 2000m
+      memory: 4Gi
+    min:
+      cpu: 10m
+      memory: 16Mi
+  - type: Pod
+    max:
+      cpu: 4000m
+      memory: 8Gi
+
+---
+# Resource Quota for development namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: development-quota
+  namespace: development
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi
+    persistentvolumeclaims: "5"
+    pods: "10"
+    services: "5"
+    secrets: "10"
+    configmaps: "10"
+
+---
+# LimitRange for development
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: dev-resource-limits
+  namespace: development
+spec:
+  limits:
+  - type: Container
+    default:
+      cpu: 50m
+      memory: 64Mi
+    defaultRequest:
+      cpu: 25m
+      memory: 32Mi
+    max:
+      cpu: 1000m
+      memory: 2Gi
+    min:
+      cpu: 5m
+      memory: 8Mi
+
+---
+# PriorityClass for critical workloads
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority
+value: 1000
+globalDefault: false
+description: "High priority class for critical workloads"
+
+---
+# PriorityClass for low priority workloads
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: low-priority
+value: 100
+globalDefault: false
+description: "Low priority class for batch workloads"
+
+---
+# NetworkPolicy for resource monitoring
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring
+  namespace: production
+spec:
+  podSelector:
+    matchLabels:
+      app: monitoring
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    - podSelector:
+        matchLabels:
+          app: prometheus
+    ports:
+    - protocol: TCP
+      port: 9090
+    - protocol: TCP
+      port: 9100
+  egress:
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
+
+---
+# Pod Disruption Budget for high availability
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: production-pdb
+  namespace: production
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: production
+
+---
+# Pod Disruption Budget for critical services
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: critical-pdb
+  namespace: production
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      priority: critical

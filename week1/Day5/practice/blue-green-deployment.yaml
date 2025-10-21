@@ -1,0 +1,236 @@
+---
+# Blue-Green Deployment Setup
+# Blue environment (current production)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-blue
+  labels:
+    app: myapp
+    version: blue
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: blue
+    spec:
+      containers:
+      - name: myapp
+        image: myapp:v1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: VERSION
+          value: "v1.0.0"
+        - name: ENVIRONMENT
+          value: "blue"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+# Green environment (new version)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-green
+  labels:
+    app: myapp
+    version: green
+spec:
+  replicas: 0  # Start with 0 replicas
+  selector:
+    matchLabels:
+      app: myapp
+      version: green
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: green
+    spec:
+      containers:
+      - name: myapp
+        image: myapp:v1.1.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: VERSION
+          value: "v1.1.0"
+        - name: ENVIRONMENT
+          value: "green"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+# Service that switches between blue and green
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+  labels:
+    app: myapp
+spec:
+  type: ClusterIP
+  selector:
+    app: myapp
+    version: blue  # Currently pointing to blue
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+
+---
+# Blue service for testing
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-blue-service
+  labels:
+    app: myapp
+    version: blue
+spec:
+  type: ClusterIP
+  selector:
+    app: myapp
+    version: blue
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+
+---
+# Green service for testing
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-green-service
+  labels:
+    app: myapp
+    version: green
+spec:
+  type: ClusterIP
+  selector:
+    app: myapp
+    version: green
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+
+---
+# LoadBalancer service for external access
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-loadbalancer
+  labels:
+    app: myapp
+spec:
+  type: LoadBalancer
+  selector:
+    app: myapp
+    version: blue  # Currently pointing to blue
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+
+---
+# ConfigMap for feature flags
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myapp-feature-flags
+  labels:
+    app: myapp
+data:
+  NEW_FEATURE_ENABLED: "false"
+  DEBUG_MODE: "false"
+  LOG_LEVEL: "info"
+
+---
+# Deployment script for blue-green switch
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: myapp-deployment-scripts
+  labels:
+    app: myapp
+data:
+  switch-to-green.sh: |
+    #!/bin/bash
+    echo "Switching traffic to green version..."
+
+    # Scale up green deployment
+    kubectl scale deployment myapp-green --replicas=3
+
+    # Wait for green to be ready
+    kubectl wait --for=condition=available --timeout=300s deployment/myapp-green
+
+    # Update service selector to point to green
+    kubectl patch svc myapp-service -p '{"spec":{"selector":{"version":"green"}}}'
+    kubectl patch svc myapp-loadbalancer -p '{"spec":{"selector":{"version":"green"}}}'
+
+    # Scale down blue deployment
+    kubectl scale deployment myapp-blue --replicas=0
+
+    echo "Successfully switched to green version"
+
+  switch-to-blue.sh: |
+    #!/bin/bash
+    echo "Rolling back to blue version..."
+
+    # Scale up blue deployment
+    kubectl scale deployment myapp-blue --replicas=3
+
+    # Wait for blue to be ready
+    kubectl wait --for=condition=available --timeout=300s deployment/myapp-blue
+
+    # Update service selector to point to blue
+    kubectl patch svc myapp-service -p '{"spec":{"selector":{"version":"blue"}}}'
+    kubectl patch svc myapp-loadbalancer -p '{"spec":{"selector":{"version":"blue"}}}'
+
+    # Scale down green deployment
+    kubectl scale deployment myapp-green --replicas=0
+
+    echo "Successfully rolled back to blue version"

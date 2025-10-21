@@ -1,0 +1,20 @@
+apiVersion: v2
+name: myapp-chart
+description: A Helm chart for a complete web application with security and monitoring
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - web
+  - application
+  - security
+  - monitoring
+home: https://example.com
+maintainers:
+  - name: DevOps Team
+    email: devops@example.com
+dependencies:
+  - name: kube-prometheus-stack
+    version: "45.0.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: monitoring.enabled

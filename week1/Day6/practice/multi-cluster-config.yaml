@@ -1,0 +1,252 @@
+---
+# Multi-Cluster Configuration
+# KubeFed cluster registration
+apiVersion: core.kubefed.io/v1beta1
+kind: KubeFedCluster
+metadata:
+  name: cluster-west
+spec:
+  apiEndpoint: https://cluster-west-api.example.com:6443
+  secretRef:
+    name: cluster-west-secret
+    namespace: kube-federation-system
+  disabledTLSValidations: false
+
+---
+apiVersion: core.kubefed.io/v1beta1
+kind: KubeFedCluster
+metadata:
+  name: cluster-east
+spec:
+  apiEndpoint: https://cluster-east-api.example.com:6443
+  secretRef:
+    name: cluster-east-secret
+    namespace: kube-federation-system
+  disabledTLSValidations: false
+
+---
+# Federated Namespace
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedNamespace
+metadata:
+  name: federated-apps
+  namespace: kube-federation-system
+spec:
+  placement:
+    clusterSelector:
+      matchLabels:
+        environment: production
+
+---
+# Federated Deployment
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedDeployment
+metadata:
+  name: federated-app
+  namespace: federated-apps
+spec:
+  template:
+    metadata:
+      labels:
+        app: federated-app
+    spec:
+      replicas: 3
+      selector:
+        matchLabels:
+          app: federated-app
+      template:
+        metadata:
+          labels:
+            app: federated-app
+        spec:
+          containers:
+          - name: app
+            image: myapp:v1.0.0
+            ports:
+            - containerPort: 8080
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "100m"
+              limits:
+                memory: "256Mi"
+                cpu: "200m"
+  placement:
+    clusters:
+    - name: cluster-west
+    - name: cluster-east
+  overrides:
+  - clusterName: cluster-west
+    clusterOverrides:
+    - path: spec.replicas
+      value: 5
+    - path: spec.template.spec.containers[0].resources
+      value:
+        requests:
+          memory: "256Mi"
+          cpu: "200m"
+        limits:
+          memory: "512Mi"
+          cpu: "500m"
+
+---
+# Federated Service
+apiVersion: types.kubefed.io/v1beta1
+kind: FederatedService
+metadata:
+  name: federated-app-service
+  namespace: federated-apps
+spec:
+  template:
+    spec:
+      type: LoadBalancer
+      selector:
+        app: federated-app
+      ports:
+      - port: 80
+        targetPort: 8080
+        protocol: TCP
+  placement:
+    clusters:
+    - name: cluster-west
+    - name: cluster-east
+
+---
+# Cluster selector for production clusters
+apiVersion: types.kubefed.io/v1beta1
+kind: ClusterSelector
+metadata:
+  name: production-clusters
+  namespace: kube-federation-system
+spec:
+  selector:
+    matchLabels:
+      environment: production
+
+---
+# Propagation policy for automatic sync
+apiVersion: types.kubefed.io/v1beta1
+kind: PropagationPolicy
+metadata:
+  name: app-propagation
+  namespace: federated-apps
+spec:
+  placement:
+    clusterSelector:
+      matchLabels:
+        environment: production
+  propagationPolicy:
+    prioritizations:
+    - weight: 100
+      clusterSelector:
+        matchLabels:
+          region: primary
+    - weight: 50
+      clusterSelector:
+        matchLabels:
+          region: secondary
+
+---
+# Multi-cluster Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: global-ingress
+  namespace: federated-apps
+  annotations:
+    kubernetes.io/ingress.class: "global"
+    external-dns.alpha.kubernetes.io/hostname: "app.example.com"
+spec:
+  ingressClassName: global
+  tls:
+  - hosts:
+    - app.example.com
+    secretName: app-tls
+  rules:
+  - host: app.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: federated-app-service
+            port:
+              number: 80
+
+---
+# Cross-cluster service discovery
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-endpoints
+  namespace: federated-apps
+data:
+  cluster-west: "https://cluster-west-api.example.com:6443"
+  cluster-east: "https://cluster-east-api.example.com:6443"
+  global-loadbalancer: "https://global.app.example.com"
+
+---
+# Multi-cluster monitoring
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: federated-app-monitor
+  namespace: federated-apps
+spec:
+  selector:
+    matchLabels:
+      app: federated-app
+  endpoints:
+  - port: metrics
+    path: /metrics
+    interval: 30s
+  namespaceSelector:
+    matchNames:
+    - federated-apps
+
+---
+# Cluster federation RBAC
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kubefed-controller
+rules:
+- apiGroups:
+  - core.kubefed.io
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups:
+  - types.kubefed.io
+  resources: ["*"]
+  verbs: ["*"]
+- apiGroups:
+  - ""
+  resources: ["namespaces", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups:
+  - "apps"
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+# Service account for federation
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubefed-controller
+  namespace: kube-federation-system
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: kubefed-controller-binding
+subjects:
+- kind: ServiceAccount
+  name: kubefed-controller
+  namespace: kube-federation-system
+roleRef:
+  kind: ClusterRole
+  name: kubefed-controller
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,59 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: myapp-base
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - configmap.yaml
+
+commonLabels:
+  app: myapp
+  environment: base
+  managed-by: kustomize
+
+images:
+  - name: myapp
+    newTag: v1.0.0
+
+replicas:
+  - name: myapp
+    count: 1
+
+namespace: default
+
+configMapGenerator:
+  - name: myapp-config
+    literals:
+      - APP_ENV=base
+      - LOG_LEVEL=info
+
+secretGenerator:
+  - name: myapp-secret
+    literals:
+      - database_url=postgresql://localhost:5432/myapp
+      - redis_url=redis://localhost:6379
+
+patchesStrategicMerge:
+  - |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: myapp
+    spec:
+      template:
+        spec:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+          containers:
+          - name: myapp
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              capabilities:
+                drop:
+                  - ALL

@@ -1,0 +1,115 @@
+---
+# Velero Backup Configuration
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: production-full-backup
+  namespace: velero
+  labels:
+    backup-type: full
+    schedule: daily
+spec:
+  includedNamespaces:
+  - production
+  - monitoring
+  - logging
+  - cert-manager
+  excludedResources:
+  - nodes
+  - events
+  - secrets  # Optional: exclude secrets for security
+  includedResources:
+  - '*'
+  storageLocation: default
+  volumeSnapshotLocations:
+  - default
+  ttl: 720h  # 30 days retention
+  hooks:
+    resources:
+    - name: mysql-hook
+      includedNamespaces:
+      - production
+      labelSelector:
+        matchLabels:
+          app: mysql
+      pre:
+      - exec:
+          container: mysql
+          command: ["/bin/sh", "-c", "mysql -u root -p$MYSQL_ROOT_PASSWORD -e 'FLUSH TABLES WITH READ LOCK;'"]
+          onError: Fail
+          timeout: 30s
+      post:
+      - exec:
+          container: mysql
+          command: ["/bin/sh", "-c", "mysql -u root -p$MYSQL_ROOT_PASSWORD -e 'UNLOCK TABLES;'"]
+          onError: Continue
+          timeout: 30s
+
+---
+# Velero Schedule for automated backups
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: production-daily-backup
+  namespace: velero
+spec:
+  schedule: "0 2 * * *"
+  template:
+    includedNamespaces:
+    - production
+    - monitoring
+    - logging
+    storageLocation: default
+    volumeSnapshotLocations:
+    - default
+    ttl: 168h  # 7 days retention for daily backups
+
+---
+# Velero Schedule for weekly full backups
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: production-weekly-backup
+  namespace: velero
+spec:
+  schedule: "0 2 * * 0"
+  template:
+    includedNamespaces:
+    - production
+    - monitoring
+    - logging
+    - cert-manager
+    storageLocation: default
+    volumeSnapshotLocations:
+    - default
+    ttl: 2160h  # 90 days retention for weekly backups
+
+---
+# Velero Restore configuration
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: production-restore
+  namespace: velero
+spec:
+  backupName: production-full-backup
+  includedNamespaces:
+  - production
+  - monitoring
+  restorePVs: true
+  preserveNodePorts: true
+  existingResourcePolicy: update
+  hooks:
+    resources:
+    - name: mysql-restore-hook
+      includedNamespaces:
+      - production
+      labelSelector:
+        matchLabels:
+          app: mysql
+      post:
+      - exec:
+          container: mysql
+          command: ["/bin/sh", "-c", "mysql -u root -p$MYSQL_ROOT_PASSWORD -e 'RESET MASTER;'"]
+          onError: Continue
+          timeout: 30s

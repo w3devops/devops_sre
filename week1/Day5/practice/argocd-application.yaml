@@ -1,0 +1,113 @@
+---
+# ArgoCD Application for production environment
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-production
+  namespace: argocd
+  labels:
+    environment: production
+    team: platform
+spec:
+  project: production
+  source:
+    repoURL: https://github.com/myorg/k8s-manifests
+    targetRevision: main
+    path: k8s/overlays/production
+    kustomize:
+      version: v5.0.0
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+      - Replace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+  revisionHistoryLimit: 10
+
+---
+# ArgoCD Application for staging environment
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: myapp-staging
+  namespace: argocd
+  labels:
+    environment: staging
+    team: platform
+spec:
+  project: staging
+  source:
+    repoURL: https://github.com/myorg/k8s-manifests
+    targetRevision: develop
+    path: k8s/overlays/staging
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - Validate=false  # Allow experimental features in staging
+
+---
+# ArgoCD Project definition
+apiVersion: argoproj.io/v1alpha1
+kind: Project
+metadata:
+  name: production
+  namespace: argocd
+spec:
+  description: Production environment project
+  destinations:
+  - namespace: 'production'
+    server: https://kubernetes.default.svc
+  - namespace: 'monitoring'
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - 'https://github.com/myorg/k8s-manifests'
+  - 'https://github.com/myorg/helm-charts'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
+  namespaceResourceBlacklist:
+  - group: ''
+    kind: ResourceQuota
+  - group: ''
+    kind: LimitRange
+
+---
+# ArgoCD Project for staging
+apiVersion: argoproj.io/v1alpha1
+kind: Project
+metadata:
+  name: staging
+  namespace: argocd
+spec:
+  description: Staging environment project
+  destinations:
+  - namespace: 'staging'
+    server: https://kubernetes.default.svc
+  - namespace: 'development'
+    server: https://kubernetes.default.svc
+  sourceRepos:
+  - 'https://github.com/myorg/k8s-manifests'
+  - 'https://github.com/myorg/helm-charts'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'

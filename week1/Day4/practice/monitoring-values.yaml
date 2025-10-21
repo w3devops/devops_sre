@@ -1,0 +1,164 @@
+# Values for Prometheus stack installation
+# This configuration is optimized for learning and development
+
+# Disable unnecessary components for simplicity
+alertmanager:
+  enabled: false
+
+kubeStateMetrics:
+  enabled: true
+
+prometheusOperator:
+  enabled: true
+
+prometheus:
+  enabled: true
+  service:
+    type: ClusterIP
+  prometheusSpec:
+    retention: 7d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 10Gi
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 250m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+
+grafana:
+  enabled: true
+  adminPassword: "prom-operator"
+  service:
+    type: ClusterIP
+  persistence:
+    enabled: true
+    size: 5Gi
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 200m
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+# Default dashboards
+dashboards:
+  default:
+    kubernetes-cluster:
+      enabled: true
+    kubernetes-resources:
+      enabled: true
+    kubernetes-system:
+      enabled: true
+
+# Install additional exporters
+nodeExporter:
+  enabled: true
+
+# Kubelet service monitor
+kubelet:
+  enabled: true
+  serviceMonitor:
+    https: true
+
+# API server monitoring
+kubeApiServer:
+  enabled: true
+
+# CoreDNS monitoring
+coreDns:
+  enabled: true
+
+# Scheduler and controller manager
+kubeScheduler:
+  enabled: true
+
+kubeControllerManager:
+  enabled: true
+
+# Proxy monitoring
+kubeProxy:
+  enabled: true
+
+# Etcd monitoring (if available)
+kubeEtcd:
+  enabled: false
+
+# Install service monitors for common applications
+prometheusOperator:
+  createCustomResource: true
+
+# Additional scrape configurations
+prometheus:
+  additionalScrapeConfigs:
+    - job_name: 'kubernetes-pods'
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+
+# Resource limits for the entire stack
+defaultRules:
+  create: true
+  rules:
+    etcd: false
+    kubeScheduler: true
+    kubernetesSystem: true
+    kubernetesResources: true
+    nodeExporter: true
+
+# Network policies for security
+networkPolicy:
+  enabled: true
+
+# RBAC for security
+rbac:
+  create: true
+
+# Service account for security
+serviceAccount:
+  create: true
+
+# Security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  fsGroup: 65534

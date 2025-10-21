@@ -1,0 +1,167 @@
+---
+# Canary deployment using Argo Rollouts
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: myapp-canary
+  labels:
+    app: myapp
+spec:
+  replicas: 10
+  strategy:
+    canary:
+      stableService: myapp-stable
+      canaryService: myapp-canary
+      steps:
+      - setWeight: 10
+      - pause: {}
+      - setWeight: 50
+      - pause: {duration: 60}
+      - setWeight: 100
+      analysis:
+        templates:
+        - templateName: success-rate
+        - templateName: error-rate
+        args:
+        - name: service-name
+          value: myapp-canary.default.svc.cluster.local
+      trafficManagement:
+        istio:
+          virtualService:
+            name: myapp-vs
+            routes:
+            - primary
+            - mirror
+  selector:
+    matchLabels:
+      app: myapp
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: canary
+    spec:
+      containers:
+      - name: myapp
+        image: myapp:v2.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: VERSION
+          value: v2.0.0
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+# Stable service (main traffic)
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-stable
+  labels:
+    app: myapp
+spec:
+  type: ClusterIP
+  selector:
+    app: myapp
+    version: stable
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+
+---
+# Canary service (test traffic)
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-canary
+  labels:
+    app: myapp
+spec:
+  type: ClusterIP
+  selector:
+    app: myapp
+    version: canary
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+
+---
+# Analysis templates for automated promotion
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: success-rate
+spec:
+  args:
+  - name: service-name
+  metrics:
+  - name: success-rate
+    interval: 60s
+    count: 5
+    successCondition: result > 0.95
+    provider:
+      job:
+        spec:
+          backoffLimit: 0
+          template:
+            spec:
+              containers:
+              - name: job
+                image: curlimages/curl
+                command: [sh, -c]
+                args:
+                - |
+                  SUCCESS_RATE=$(curl -s "http://prometheus-operated:9090/api/v1/query?query=rate(http_requests_total{job=\"myapp\",status=~\"2..\"}[5m])" | jq -r '.data.result[0].value[1]')
+                  echo "Success rate: $SUCCESS_RATE"
+                  echo "$SUCCESS_RATE" > /tmp/success-rate
+              restartPolicy: Never
+
+---
+# Error rate analysis template
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: error-rate
+spec:
+  metrics:
+  - name: error-rate
+    interval: 60s
+    count: 5
+    successCondition: result < 0.05
+    provider:
+      job:
+        spec:
+          backoffLimit: 0
+          template:
+            spec:
+              containers:
+              - name: job
+                image: curlimages/curl
+                command: [sh, -c]
+                args:
+                - |
+                  ERROR_RATE=$(curl -s "http://prometheus-operated:9090/api/v1/query?query=rate(http_requests_total{job=\"myapp\",status=~\"5..\"}[5m])" | jq -r '.data.result[0].value[1]')
+                  echo "Error rate: $ERROR_RATE"
+                  echo "$ERROR_RATE" > /tmp/error-rate
+              restartPolicy: Never

@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1 Day 2: Kubernetes Deployments & Configuration - DevOps/SRE Learning Portfolio</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h1, h2, h3 {
+            color: #667eea;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .goal-box {
+            background: #e8f5e8;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .task-list li:before {
+            content: "📋";
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .component-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .component-box h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        .mermaid {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .nav-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .flow-steps {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+        }
+
+        .flow-steps li {
+            counter-increment: step-counter;
+            padding: 15px 0;
+            border-bottom: 1px solid #e1e4e8;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .flow-steps li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 15px;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-block .comment {
+            color: #a0aec0;
+        }
+
+        .code-block .keyword {
+            color: #9f7aea;
+        }
+
+        .code-block .string {
+            color: #68d391;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .mermaid {
+                padding: 10px;
+                margin: 15px 0;
+            }
+
+            .mermaid svg {
+                transform: scale(0.8);
+                transform-origin: top left;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mermaid svg {
+                transform: scale(0.6);
+                transform-origin: top left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐳 Week 1: Kubernetes, Docker, Networking, and Security</h1>
+            <p>Day 2: Deployments, Services, and Configuration Management</p>
+        </div>
+
+        <div class="breadcrumb">
+            <a href="../../index.html">Home</a> > 
+            <a href="../../documentation.html">Documentation</a> > 
+            <a href="../README.html">Week 1</a> >
+            Day 2: Deployments & Configuration
+        </div>
+
+        <div class="content">
+            <h1>Day 2: Deployments, Services, and Configuration Management (6 hours)</h1>
+            
+            <div class="goal-box">
+                <h3>🎯 Goal</h3>
+                <p>Master Kubernetes Deployments, Services, and configuration management with ConfigMaps and Secrets.</p>
+            </div>
+
+            <h2>📚 Learning Objectives</h2>
+            <ul class="task-list">
+                <li>Learn: Deployments, ReplicaSets, Services, ConfigMaps, and Secrets</li>
+                <li>Practice: Create scalable applications with rolling updates</li>
+                <li>Task: Deploy a multi-tier application with proper configuration management</li>
+                <li>Resources: Kubernetes docs, hands-on practice with real applications</li>
+            </ul>
+
+            <h2>🚀 Deployments Overview</h2>
+            <p>Deployments are the recommended way to manage stateless applications in Kubernetes. They provide declarative updates, scaling, and rollback capabilities.</p>
+
+            <div class="component-box">
+                <h3>🎯 Deployment Benefits</h3>
+                <ul>
+                    <li><strong>Declarative Updates:</strong> Define desired state, Kubernetes handles the rest</li>
+                    <li><strong>Scaling:</strong> Easily scale replicas up or down</li>
+                    <li><strong>Rolling Updates:</strong> Zero-downtime application updates</li>
+                    <li><strong>Rollback:</strong> Quick rollback to previous versions</li>
+                    <li><strong>Self-healing:</strong> Automatically replaces failed pods</li>
+                </ul>
+            </div>
+
+            <h2>🏗️ Deployment Architecture</h2>
+            
+            <div class="mermaid">
+                graph TB
+                    subgraph "Deployment Management"
+                        DEPLOY[Deployment<br/>Desired State]
+                        RS[ReplicaSet<br/>Current State]
+                        POD1[Pod 1<br/>v1.2.1]
+                        POD2[Pod 2<br/>v1.2.1]
+                        POD3[Pod 3<br/>v1.2.1]
+                    end
+                    
+                    DEPLOY --> RS
+                    RS --> POD1
+                    RS --> POD2
+                    RS --> POD3
+                    
+                    %% Styling
+                    classDef deployment fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+                    classDef replicaset fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+                    classDef pod fill:#e8f5e8,stroke:#2e7d32,stroke-width:1px
+                    
+                    class DEPLOY deployment
+                    class RS replicaset
+                    class POD1,POD2,POD3 pod
+            </div>
+
+            <h2>🔧 Hands-On Practice: Deployments</h2>
+            
+            <div class="component-box">
+                <h3>📝 Step 1: Create Nginx Deployment</h3>
+                <p>Let's create a deployment with multiple replicas:</p>
+                
+                <div class="code-block">
+# Create deployment.yaml
+<span class="keyword">apiVersion</span>: <span class="string">apps/v1</span>
+<span class="keyword">kind</span>: <span class="string">Deployment</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">nginx-deployment</span>
+  <span class="keyword">labels</span>:
+    <span class="keyword">app</span>: <span class="string">nginx</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">replicas</span>: <span class="string">3</span>
+  <span class="keyword">selector</span>:
+    <span class="keyword">matchLabels</span>:
+      <span class="keyword">app</span>: <span class="string">nginx</span>
+  <span class="keyword">template</span>:
+    <span class="keyword">metadata</span>:
+      <span class="keyword">labels</span>:
+        <span class="keyword">app</span>: <span class="string">nginx</span>
+    <span class="keyword">spec</span>:
+      <span class="keyword">containers</span>:
+      - <span class="keyword">name</span>: <span class="string">nginx</span>
+        <span class="keyword">image</span>: <span class="string">nginx:1.21.0</span>
+        <span class="keyword">ports</span>:
+        - <span class="keyword">containerPort</span>: <span class="string">80</span>
+</div>
+
+                <h4>Apply the deployment:</h4>
+                <pre><code>kubectl apply -f practice/deployment.yaml</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>deployment.apps/nginx-deployment created</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>✅ Step 2: Verify Deployment</h3>
+                <p>Check that the deployment created the pods:</p>
+                <pre><code>kubectl get deployments
+kubectl get pods
+kubectl get replicasets</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>NAME               READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deployment   3/3     3            3           30s
+
+NAME                               READY   STATUS    RESTARTS   AGE
+nginx-deployment-7b5c8c6b4-2l4x9   1/1     Running   0          30s
+nginx-deployment-7b5c8c6b4-5p2k1   1/1     Running   0          30s
+nginx-deployment-7b5c8c6b4-8m9n2   1/1     Running   0          30s
+
+NAME                             DESIRED   CURRENT   READY   AGE
+nginx-deployment-7b5c8c6b4       3         3         3       30s</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>🔄 Step 3: Update Deployment</h3>
+                <p>Update the Nginx version and see rolling update in action:</p>
+                <pre><code>kubectl set image deployment/nginx-deployment nginx=nginx:1.22.0</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>deployment.apps/nginx-deployment image updated</code></pre>
+                
+                <h4>Watch the rolling update:</h4>
+                <pre><code>kubectl rollout status deployment/nginx-deployment</code></pre>
+                <p><strong>Expected Output:</strong></p>
+                <pre><code>Waiting for deployment "nginx-deployment" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "nginx-deployment" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "nginx-deployment" rollout to finish: 2 out of 3 new replicas have been updated...
+Waiting for deployment "nginx-deployment" rollout to finish: 1 old replicas are pending termination...
+Waiting for deployment "nginx-deployment" rollout to finish: 1 old replicas are pending termination...
+deployment "nginx-deployment" successfully rolled out</code></pre>
+            </div>
+
+            <h2>🌐 Services Deep Dive</h2>
+            
+            <div class="component-box">
+                <h3>🔗 Service Types</h3>
+                <ul>
+                    <li><strong>ClusterIP:</strong> Internal cluster communication (default)</li>
+                    <li><strong>NodePort:</strong> External access via node IP and port</li>
+                    <li><strong>LoadBalancer:</strong> Cloud provider load balancer</li>
+                    <li><strong>ExternalName:</strong> CNAME record for external services</li>
+                </ul>
+            </div>
+
+            <div class="component-box">
+                <h3>📝 Step 4: Create Services</h3>
+                <p>Create different types of services for your deployment:</p>
+                
+                <h4>ClusterIP Service:</h4>
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">v1</span>
+<span class="keyword">kind</span>: <span class="string">Service</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">nginx-clusterip</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">type</span>: <span class="string">ClusterIP</span>
+  <span class="keyword">selector</span>:
+    <span class="keyword">app</span>: <span class="string">nginx</span>
+  <span class="keyword">ports</span>:
+  - <span class="keyword">port</span>: <span class="string">80</span>
+    <span class="keyword">targetPort</span>: <span class="string">80</span>
+</div>
+
+                <h4>NodePort Service:</h4>
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">v1</span>
+<span class="keyword">kind</span>: <span class="string">Service</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">nginx-nodeport</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">type</span>: <span class="string">NodePort</span>
+  <span class="keyword">selector</span>:
+    <span class="keyword">app</span>: <span class="string">nginx</span>
+  <span class="keyword">ports</span>:
+  - <span class="keyword">port</span>: <span class="string">80</span>
+    <span class="keyword">targetPort</span>: <span class="string">80</span>
+    <span class="keyword">nodePort</span>: <span class="string">30080</span>
+</div>
+            </div>
+
+            <h2>⚙️ Configuration Management</h2>
+            
+            <h3>📋 ConfigMaps</h3>
+            <p>ConfigMaps allow you to decouple configuration from container images, making your applications more portable and flexible.</p>
+
+            <div class="component-box">
+                <h3>📝 Step 5: Create ConfigMap</h3>
+                <p>Create a ConfigMap for application configuration:</p>
+                
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">v1</span>
+<span class="keyword">kind</span>: <span class="string">ConfigMap</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">nginx-config</span>
+<span class="keyword">data</span>:
+  <span class="keyword">index.html</span>: <span class="string">|
+    <!DOCTYPE html>
+    <html>
+    <body>
+    <h1>Welcome to My App!</h1>
+    <p>This is served from Kubernetes ConfigMap</p>
+    </body>
+    </html></span>
+</div>
+
+                <h4>Apply and verify:</h4>
+                <pre><code>kubectl apply -f practice/configmap.yaml
+kubectl get configmaps
+kubectl describe configmap nginx-config</code></pre>
+            </div>
+
+            <h3>🔐 Secrets</h3>
+            <p>Secrets are used to store sensitive information like passwords, tokens, and keys securely in the cluster.</p>
+
+            <div class="component-box">
+                <h3>📝 Step 6: Create Secret</h3>
+                <p>Create a secret for sensitive data:</p>
+                
+                <h4>Method 1 - Using kubectl:</h4>
+                <pre><code>kubectl create secret generic db-secret --from-literal=username=myuser --from-literal=password=mypassword</code></pre>
+                
+                <h4>Method 2 - Using YAML:</h4>
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">v1</span>
+<span class="keyword">kind</span>: <span class="string">Secret</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">app-secret</span>
+<span class="keyword">type</span>: <span class="string">Opaque</span>
+<span class="keyword">data</span>:
+  <span class="comment"># Base64 encoded values</span>
+  <span class="keyword">username</span>: <span class="string">bXl1c2Vy</span>
+  <span class="keyword">password</span>: <span class="string">bXlwYXNzd29yZA==</span>
+</div>
+
+                <h4>Verify secret:</h4>
+                <pre><code>kubectl get secrets
+kubectl describe secret app-secret</code></pre>
+            </div>
+
+            <h2>🏗️ Multi-Tier Application</h2>
+            
+            <div class="component-box">
+                <h3>📝 Step 7: Deploy Complete Application</h3>
+                <p>Deploy a complete web application with frontend and backend:</p>
+                
+                <h4>Backend Deployment:</h4>
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">apps/v1</span>
+<span class="keyword">kind</span>: <span class="string">Deployment</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">backend</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">replicas</span>: <span class="string">2</span>
+  <span class="keyword">selector</span>:
+    <span class="keyword">matchLabels</span>:
+      <span class="keyword">app</span>: <span class="string">backend</span>
+  <span class="keyword">template</span>:
+    <span class="keyword">metadata</span>:
+      <span class="keyword">labels</span>:
+        <span class="keyword">app</span>: <span class="string">backend</span>
+    <span class="keyword">spec</span>:
+      <span class="keyword">containers</span>:
+      - <span class="keyword">name</span>: <span class="string">backend</span>
+        <span class="keyword">image</span>: <span class="string">nginx:1.21</span>
+        <span class="keyword">ports</span>:
+        - <span class="keyword">containerPort</span>: <span class="string">80</span>
+        <span class="keyword">env</span>:
+        - <span class="keyword">name</span>: <span class="string">DATABASE_URL</span>
+          <span class="keyword">valueFrom</span>:
+            <span class="keyword">secretKeyRef</span>:
+              <span class="keyword">name</span>: <span class="string">db-secret</span>
+              <span class="keyword">key</span>: <span class="string">url</span>
+</div>
+
+                <h4>Frontend Deployment:</h4>
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">apps/v1</span>
+<span class="keyword">kind</span>: <span class="string">Deployment</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">frontend</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">replicas</span>: <span class="string">3</span>
+  <span class="keyword">selector</span>:
+    <span class="keyword">matchLabels</span>:
+      <span class="keyword">app</span>: <span class="string">frontend</span>
+  <span class="keyword">template</span>:
+    <span class="keyword">metadata</span>:
+      <span class="keyword">labels</span>:
+        <span class="keyword">app</span>: <span class="string">frontend</span>
+    <span class="keyword">spec</span>:
+      <span class="keyword">containers</span>:
+      - <span class="keyword">name</span>: <span class="string">frontend</span>
+        <span class="keyword">image</span>: <span class="string">nginx:1.21</span>
+        <span class="keyword">ports</span>:
+        - <span class="keyword">containerPort</span>: <span class="string">80</span>
+        <span class="keyword">volumeMounts</span>:
+        - <span class="keyword">name</span>: <span class="string">config</span>
+          <span class="keyword">mountPath</span>: <span class="string">/usr/share/nginx/html</span>
+  <span class="keyword">volumes</span>:
+  - <span class="keyword">name</span>: <span class="string">config</span>
+    <span class="keyword">configMap</span>:
+      <span class="keyword">name</span>: <span class="string">nginx-config</span>
+</div>
+            </div>
+
+            <h2>🔧 Essential kubectl Commands</h2>
+            
+            <div class="component-box">
+                <h3>📋 Deployment Commands</h3>
+                <pre><code># Scale deployment
+kubectl scale deployment nginx-deployment --replicas=5
+
+# Check rollout status
+kubectl rollout status deployment/nginx-deployment
+
+# View rollout history
+kubectl rollout history deployment/nginx-deployment
+
+# Rollback to previous version
+kubectl rollout undo deployment/nginx-deployment
+
+# Pause/resume rollout
+kubectl rollout pause deployment/nginx-deployment
+kubectl rollout resume deployment/nginx-deployment</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>🔍 Debugging Commands</h3>
+                <pre><code># Get detailed pod information
+kubectl describe pod <pod-name>
+
+# View logs from all pods in deployment
+kubectl logs -l app=nginx
+
+# Execute command in pod
+kubectl exec -it <pod-name> -- /bin/bash
+
+# Port forward to access pod locally
+kubectl port-forward pod/<pod-name> 8080:80
+
+# Check resource usage
+kubectl top pods
+kubectl top nodes</code></pre>
+            </div>
+
+            <h2>📚 Daily Tasks</h2>
+            <div class="goal-box">
+                <h3>✅ Today's Checklist</h3>
+                <ul class="task-list">
+                    <li>Create and manage Kubernetes Deployments</li>
+                    <li>Implement different service types (ClusterIP, NodePort)</li>
+                    <li>Practice rolling updates and rollbacks</li>
+                    <li>Create and use ConfigMaps for configuration</li>
+                    <li>Create and use Secrets for sensitive data</li>
+                    <li>Deploy a multi-tier application</li>
+                    <li>Practice scaling and debugging commands</li>
+                </ul>
+            </div>
+
+            <h2>🎯 Best Practices</h2>
+            <div class="component-box">
+                <h3>💡 Deployment Best Practices</h3>
+                <ul>
+                    <li><strong>Use Deployments:</strong> Always use Deployments instead of raw Pods</li>
+                    <li><strong>Resource Limits:</strong> Set resource requests and limits</li>
+                    <li><strong>Health Checks:</strong> Implement readiness and liveness probes</li>
+                    <li><strong>Labels:</strong> Use consistent labeling strategies</li>
+                    <li><strong>Config Separation:</strong> Use ConfigMaps and Secrets</li>
+                </ul>
+            </div>
+
+            <h2>📚 Resources</h2>
+            <ul>
+                <li><a href="https://kubernetes.io/docs/concepts/workloads/controllers/deployment/" target="_blank">Kubernetes Deployments Documentation</a></li>
+                <li><a href="https://kubernetes.io/docs/concepts/services-networking/service/" target="_blank">Kubernetes Services Documentation</a></li>
+                <li><a href="https://kubernetes.io/docs/concepts/configuration/configmap/" target="_blank">ConfigMaps Guide</a></li>
+                <li><a href="https://kubernetes.io/docs/concepts/configuration/secret/" target="_blank">Secrets Guide</a></li>
+            </ul>
+
+            <div class="nav-buttons">
+                <a href="../../index.html" class="btn">← Back to Home</a>
+                <a href="../../documentation.html" class="btn">← Back to Documentation</a>
+                <a href="../README.html" class="btn">← Back to Week 1</a>
+                <a href="practice/" class="btn">🚀 Practice Exercises</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Mermaid with mobile-friendly settings
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            responsive: true
+        });
+
+        // Handle mobile viewport
+        function adjustMermaidForMobile() {
+            const mermaidDivs = document.querySelectorAll('.mermaid');
+            mermaidDivs.forEach(div => {
+                const svg = div.querySelector('svg');
+                if (svg && window.innerWidth <= 768) {
+                    svg.style.maxWidth = '100%';
+                    svg.style.height = 'auto';
+                }
+            });
+        }
+
+        // Adjust on load and resize
+        window.addEventListener('load', adjustMermaidForMobile);
+        window.addEventListener('resize', adjustMermaidForMobile);
+    </script>
+</body>
+</html>

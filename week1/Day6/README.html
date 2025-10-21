@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1 Day 6: Multi-Cluster Management & Production Operations - DevOps/SRE Learning Portfolio</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .nav-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        pre {
+            background: #f6f8fa;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Courier New', monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐳 Week 1: Kubernetes, Docker, Networking, and Security</h1>
+            <p>Day 6: Multi-Cluster Management and Production Operations</p>
+        </div>
+
+        <div class="content">
+            <h2>Day 6: Multi-Cluster Management and Production Operations (6 hours)</h2>
+            <ul>
+                <li><strong>Learn:</strong> Multi-cluster architectures and federation</li>
+                <li><strong>Practice:</strong> Backup and disaster recovery with Velero</li>
+                <li><strong>Task:</strong> Implement performance optimization strategies</li>
+                <li><strong>Master:</strong> Production operations and troubleshooting</li>
+            </ul>
+
+            <h2>Multi-Cluster Architecture</h2>
+            <p>Multi-cluster architectures provide high availability, disaster recovery, and geographic distribution of applications.</p>
+
+            <h3>Cluster Types</h3>
+            <ul>
+                <li><strong>Primary Clusters:</strong> Main production workloads</li>
+                <li><strong>Secondary Clusters:</strong> Failover and disaster recovery</li>
+                <li><strong>Edge Clusters:</strong> Low-latency regional access</li>
+                <li><strong>Development Clusters:</strong> Testing and staging environments</li>
+            </ul>
+
+            <h2>Essential Commands</h2>
+
+            <h3>Multi-Cluster Management</h3>
+            <pre><code># Switch between cluster contexts
+kubectl config use-context cluster-1
+kubectl config use-context cluster-2
+
+# View all contexts
+kubectl config get-contexts
+
+# Copy resources between clusters
+kubectl get deployment myapp -o yaml | kubectl apply -f -
+
+# Check cluster federation
+kubectl get kubefedclusters</code></pre>
+
+            <h3>Backup & Recovery</h3>
+            <pre><code># Install Velero
+velero install --provider aws --plugins velero/velero-plugin-for-aws:v1.8.0 --bucket my-bucket --backup-location-config region=us-east-1
+
+# Create backup
+velero backup create production-backup --include-namespaces production,monitoring
+
+# List backups
+velero backup get
+
+# Restore from backup
+velero restore create --from-backup production-backup</code></pre>
+
+            <h3>Performance Optimization</h3>
+            <pre><code># Check resource utilization
+kubectl top nodes
+kubectl top pods --all-namespaces
+
+# Monitor cluster performance
+kubectl get --raw /metrics | grep -E "(cpu|memory)"
+
+# Check storage performance
+kubectl exec -it <pod-name> -- iostat -x 1 5
+
+# Network performance testing
+kubectl run netperf --image=networkstatic/netperf --rm -it</code></pre>
+
+            <h3>Production Operations</h3>
+            <pre><code># Cluster health checks
+kubectl get componentstatuses
+kubectl get nodes
+kubectl get pods --all-namespaces -o wide
+
+# Node maintenance
+kubectl drain <node-name> --ignore-daemonsets --delete-emptydir-data
+kubectl cordon <node-name>
+kubectl uncordon <node-name></code></pre>
+
+            <h2>Velero Backup Configuration</h2>
+
+            <h3>Backup Custom Resource</h3>
+            <pre><code>apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: production-backup
+  namespace: velero
+spec:
+  includedNamespaces:
+  - production
+  - monitoring
+  excludedResources:
+  - nodes
+  - events
+  storageLocation: default</code></pre>
+
+            <h3>Resource Management</h3>
+            <pre><code>apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: production-quota
+  namespace: production
+spec:
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi</code></pre>
+
+            <h2>Daily Tasks Checklist</h2>
+            <ul>
+                <li>Set up multi-cluster architecture and management</li>
+                <li>Install and configure Velero for backup/restore</li>
+                <li>Create automated backup schedules</li>
+                <li>Implement performance monitoring and optimization</li>
+                <li>Practice cluster troubleshooting techniques</li>
+                <li>Set up cost monitoring and optimization</li>
+                <li>Perform cluster maintenance operations</li>
+            </ul>
+
+            <h2>Key Takeaways</h2>
+            <ul>
+                <li><strong>Multi-Cluster Architecture</strong> provides high availability and disaster recovery capabilities</li>
+                <li><strong>Velero</strong> enables comprehensive backup and restore of Kubernetes resources</li>
+                <li><strong>Performance Optimization</strong> requires continuous monitoring and right-sizing</li>
+                <li><strong>Cost Management</strong> involves tracking usage and eliminating waste</li>
+                <li><strong>Production Operations</strong> require systematic maintenance and troubleshooting</li>
+            </ul>
+
+            <div class="nav-buttons">
+                <a href="../../index.html" class="btn">← Back to Home</a>
+                <a href="../../documentation.html" class="btn">← Back to Documentation</a>
+                <a href="../README.html" class="btn">← Back to Week 1</a>
+                <a href="./index.html" class="btn">View Full Day 6 Content</a>
+                <a href="practice/" class="btn">🚀 Practice Exercises</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

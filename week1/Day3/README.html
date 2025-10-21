@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1 Day 3: StatefulSets, Storage & Ingress - DevOps/SRE Learning Portfolio</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .nav-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        pre {
+            background: #f6f8fa;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Courier New', monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐳 Week 1: Kubernetes, Docker, Networking, and Security</h1>
+            <p>Day 3: StatefulSets, Persistent Storage, and Ingress Controllers</p>
+        </div>
+
+        <div class="content">
+            <h2>Day 3: StatefulSets, Persistent Storage, and Ingress Controllers (6 hours)</h2>
+            <ul>
+                <li><strong>Learn:</strong> StatefulSets for stateful applications and persistent storage</li>
+                <li><strong>Practice:</strong> Configure PersistentVolumes and PersistentVolumeClaims</li>
+                <li><strong>Task:</strong> Deploy a stateful application with persistent data</li>
+                <li><strong>Master:</strong> Ingress controllers for advanced routing and load balancing</li>
+            </ul>
+
+            <h2>StatefulSets Overview</h2>
+            <p>StatefulSets are used for stateful applications that require persistent storage, stable network identities, and ordered deployment/scaling.</p>
+
+            <h3>StatefulSet Use Cases</h3>
+            <ul>
+                <li><strong>Databases:</strong> MySQL, PostgreSQL, MongoDB clusters</li>
+                <li><strong>Message Queues:</strong> Kafka, RabbitMQ with persistent storage</li>
+                <li><strong>Distributed Storage:</strong> Ceph, GlusterFS clusters</li>
+                <li><strong>Machine Learning:</strong> Stateful training jobs with data persistence</li>
+            </ul>
+
+            <h2>Essential Commands</h2>
+
+            <h3>StatefulSet Management</h3>
+            <pre><code># Create StatefulSet
+kubectl apply -f statefulset.yaml
+
+# Scale StatefulSet
+kubectl scale statefulset mysql-statefulset --replicas=5
+
+# Update StatefulSet
+kubectl patch statefulset mysql-statefulset -p '{"spec":{"template":{"spec":{"containers":[{"name":"mysql","image":"mysql:8.1"}]}}}}'
+
+# Check StatefulSet status
+kubectl rollout status statefulset/mysql-statefulset</code></pre>
+
+            <h3>Storage Management</h3>
+            <pre><code># List storage resources
+kubectl get pv,pvc,storageclass
+
+# Create PersistentVolume
+kubectl apply -f persistent-volume.yaml
+
+# Create PersistentVolumeClaim
+kubectl apply -f persistent-volume-claim.yaml
+
+# Resize PVC (if supported)
+kubectl patch pvc mysql-pvc -p '{"spec":{"resources":{"requests":{"storage":"10Gi"}}}}'</code></pre>
+
+            <h3>Ingress Management</h3>
+            <pre><code># Install NGINX Ingress Controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml
+
+# Create Ingress resource
+kubectl apply -f ingress.yaml
+
+# Get Ingress resources
+kubectl get ingress
+
+# Check Ingress Controller logs
+kubectl logs -n ingress-nginx deployment/ingress-nginx-controller</code></pre>
+
+            <h2>Storage Components</h2>
+
+            <h3>Access Modes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Access Mode</th>
+                        <th>Description</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>ReadWriteOnce (RWO)</strong></td>
+                        <td>Single node read-write</td>
+                        <td>Most applications, databases</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ReadOnlyMany (ROX)</strong></td>
+                        <td>Multiple nodes read-only</td>
+                        <td>ConfigMaps, static content</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ReadWriteMany (RWX)</strong></td>
+                        <td>Multiple nodes read-write</td>
+                        <td>Shared storage, collaborative apps</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Daily Tasks Checklist</h2>
+            <ul>
+                <li>Create and manage PersistentVolumes and PersistentVolumeClaims</li>
+                <li>Deploy a StatefulSet with persistent storage</li>
+                <li>Install and configure NGINX Ingress Controller</li>
+                <li>Create Ingress resources for traffic routing</li>
+                <li>Configure StorageClasses for dynamic provisioning</li>
+                <li>Test stateful application scaling and updates</li>
+                <li>Practice storage and networking debugging</li>
+            </ul>
+
+            <h2>Key Takeaways</h2>
+            <ul>
+                <li><strong>StatefulSets</strong> provide stable network identities and persistent storage</li>
+                <li><strong>PersistentVolumes</strong> abstract underlying storage and provide persistent data</li>
+                <li><strong>StorageClasses</strong> enable dynamic volume provisioning</li>
+                <li><strong>Ingress Controllers</strong> provide advanced load balancing and routing</li>
+                <li><strong>Access Modes</strong> determine how storage can be accessed by pods</li>
+            </ul>
+
+            <div class="nav-buttons">
+                <a href="../../index.html" class="btn">← Back to Home</a>
+                <a href="../../documentation.html" class="btn">← Back to Documentation</a>
+                <a href="../README.html" class="btn">← Back to Week 1</a>
+                <a href="./index.html" class="btn">View Full Day 3 Content</a>
+                <a href="practice/" class="btn">🚀 Practice Exercises</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

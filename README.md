@@ -8,125 +8,144 @@ This repository documents my structured learning journey to master DevOps and SR
 
 | Week | Focus Area | Key Technologies |
 |------|------------|------------------|
-| [Week 1](#week-1) | Kubernetes & Docker Foundation | Minikube, Docker, RBAC, Network Policies |
-| [Week 2](#week-2) | GitOps & Developer Experience | ArgoCD, Kustomize, Helm |
-| [Week 3](#week-3) | Observability Basics | Prometheus, Grafana, HPA |
-| [Week 4](#week-4) | Advanced Observability | Loki, Tempo, Jaeger, OpenTelemetry |
-| [Week 5](#week-5) | Service Mesh | Istio, mTLS, Circuit Breakers |
-| [Week 6](#week-6) | CI/CD & SRE Principles | Jenkins, Argo Workflows, SLOs |
-| [Week 7](#week-7) | Cloud & Infrastructure | AWS/EKS, GCP/GKE, Terraform |
-| [Week 8](#week-8) | Advanced Topics | Databases, Chaos Engineering |
+| [Week 1](#week-1) | Complete Kubernetes Foundation | Minikube, Docker, RBAC, Network Policies, StatefulSets, Helm, Monitoring, Multi-Cluster |
+| [Week 2](#week-2) | Kubernetes Operators & Advanced Patterns | Controller Runtime, Custom Operators, CRDs, Admission Controllers |
+| [Week 3](#week-3) | Advanced Networking & Service Mesh | Istio, mTLS, Circuit Breakers, Advanced Network Policies |
+| [Week 4](#week-4) | Cloud Platforms & Infrastructure | AWS EKS, GCP GKE, Terraform, Cloud-Native Services |
+| [Week 5](#week-5) | Advanced Observability & SRE | Jaeger, OpenTelemetry, Loki, SLOs, Error Budgets |
+| [Week 6](#week-6) | Production Operations & Troubleshooting | Performance Optimization, Security Hardening, Backup/Restore |
+| [Week 7](#week-7) | Enterprise Patterns & Architecture | Multi-Cluster Federation, Policy as Code, FinOps |
+| [Week 8](#week-8) | Capstone & Interview Preparation | System Design, Chaos Engineering, Interview Practice |
 
 **Additional Resources:**
 - [Capstone Project](#capstone-project)
 - [Runbook](#runbook)
 - [Interview Notes](#interview-notes)
 
-## 🐳 Week 1: Kubernetes, Docker, Networking, and Security
+## 🐳 Week 1: Complete Kubernetes Foundation (6 Days)
 
 ### 🎯 Objective
-Master Kubernetes/Docker basics, networking, security, and scripting fundamentals.
+Master Kubernetes from basics to production operations with comprehensive hands-on experience across all core concepts.
 
-### ✅ Completed Tasks
-- ✅ Deployed Nginx to Minikube, exposed as a service
-- ✅ Built a Docker image for a Flask app, pushed to Docker Hub
-- ✅ Configured Network Policy, RBAC, and scanned images with Trivy
-- ✅ Wrote Python/Bash scripts for automation
-- ✅ Set up resource limits and HPA
+### ✅ Complete Learning Path
+- **Day 1**: Kubernetes Basics - Architecture, pods, services, Minikube installation
+- **Day 2**: Deployments & Configuration - ConfigMaps, Secrets, scaling, rolling updates
+- **Day 3**: StatefulSets & Storage - Persistent volumes, Ingress controllers, stateful applications
+- **Day 4**: Security & Monitoring - RBAC, Network Policies, Prometheus, Grafana, Helm
+- **Day 5**: CI/CD & GitOps - GitHub Actions, ArgoCD, canary deployments, multi-environment
+- **Day 6**: Multi-Cluster & Operations - Backup with Velero, performance optimization, cost management
 
-### 📁 Artifacts
-| File | Description |
-|------|-------------|
-| [Dockerfile](./week1/Dockerfile) | Container configuration for Flask app |
-| [Network Policy YAML](./week1/network-policy.yaml) | Kubernetes network security rules |
-| [Python Script](./week1/k8s_query.py) | Automation script for K8s operations |
-| [Troubleshooting Log](./week1/troubleshooting.md) | Debug session documentation |
+### 📁 Complete Artifacts Structure
+| Day | Focus Area | Key Files |
+|-----|------------|-----------|
+| [Day 1](./week1/Day1/) | Kubernetes Basics | index.html, README.md, practice/nginx.yaml |
+| [Day 2](./week1/Day2/) | Deployments & Config | index.html, README.md, practice/deployment.yaml, service.yaml |
+| [Day 3](./week1/Day3/) | StatefulSets & Storage | index.html, README.md, practice/statefulset.yaml, ingress.yaml |
+| [Day 4](./week1/Day4/) | Security & Monitoring | index.html, README.md, practice/rbac.yaml, monitoring-values.yaml |
+| [Day 5](./week1/Day5/) | CI/CD & GitOps | index.html, README.md, practice/ci-cd.yml, canary-rollout.yaml |
+| [Day 6](./week1/Day6/) | Multi-Cluster & Ops | index.html, README.md, practice/velero-backup.yaml, cost-optimization.yaml |
 
-### 🚀 Mini-Project
-Deployed a Flask app with resource limits, Network Policy, and RBAC - demonstrating production-ready Kubernetes practices.
+### 🚀 Capstone Project
+Complete production-ready Kubernetes deployment with multi-tier applications, security, monitoring, CI/CD, and operational excellence.
 
-### 📚 **Detailed Content**
-- [Day 1: Kubernetes Basics](./week1/Day1/README.md) - Complete Kubernetes architecture and fundamentals
+### 📚 **Detailed Daily Content**
+- [Day 1: Kubernetes Basics](./week1/Day1/README.md) - Architecture, pods, services, installation
+- [Day 2: Deployments & Configuration](./week1/Day2/README.md) - Application management and scaling
+- [Day 3: StatefulSets & Storage](./week1/Day3/README.md) - Persistent data and advanced networking
+- [Day 4: Security & Monitoring](./week1/Day4/README.md) - RBAC, observability, package management
+- [Day 5: CI/CD & GitOps](./week1/Day5/README.md) - Automation and deployment strategies
+- [Day 6: Multi-Cluster & Operations](./week1/Day6/README.md) - Enterprise operations and optimization
 
-## Week 2: GitOps, Kustomize, Helm, and Developer Experience
-- **Objective**: Master GitOps workflows, Kustomize, Helm, and developer collaboration.
+## Week 2: Kubernetes Operators & Advanced Patterns
+- **Objective**: Master Kubernetes operators, controllers, and advanced development patterns for production applications.
 - **Tasks**:
-  - Installed ArgoCD, deployed app via GitOps.
-  - Created Kustomize manifests for dev/staging environments.
-  - Packaged a Flask app as a Helm chart.
-  - Wrote a developer guide for Kustomize and compared Fluentd vs. Loki.
+  - Built custom controllers using controller-runtime framework.
+  - Created Kubernetes operators for complex stateful applications.
+  - Designed CRDs and implemented reconciliation patterns.
+  - Built admission controllers and validation webhooks.
 - **Artifacts**:
-  - [Kustomize Manifests](./week2/kustomize/)
-  - [Helm Chart](./week2/helm/)
-  - [Developer Guide](./week2/developer-guide.md)
-- **Mini-Project**: Deployed Flask + Redis app using Kustomize, Helm, and ArgoCD.
+  - [Custom Operator](./week2/operator/) - Complete operator implementation with controller-runtime
+  - [CRD Definitions](./week2/crd/) - Custom resource definitions and schemas
+  - [Admission Webhooks](./week2/webhook/) - Validation and mutation webhook implementations
+- **Mini-Project**: Built a complete database operator that manages PostgreSQL clusters with automated failover and backups.
 
-## Week 3: Observability (Prometheus, Grafana)
-- **Objective**: Learn monitoring and metrics.
+## Week 3: Advanced Networking & Service Mesh
+- **Objective**: Master service mesh architecture, advanced networking patterns, and microservices communication.
 - **Tasks**:
-  - Installed Prometheus/Grafana, configured metrics scraping.
-  - Created Grafana dashboards for CPU/memory/HTTP metrics.
-  - Set up HPA and alerts, debugged high-load issue.
+  - Deployed Istio service mesh with mTLS encryption.
+  - Implemented circuit breakers, retries, and timeout policies.
+  - Advanced network policies and CNI plugin configurations.
+  - Service mesh observability and security patterns.
 - **Artifacts**:
-  - [Prometheus Config](./week3/prometheus.yml)
-  - [Grafana Dashboard JSON](./week3/dashboard.json)
-- **Mini-Project**: Monitored a microservices app with Prometheus/Grafana and HPA.
+  - [Istio Configuration](./week3/istio-config/) - Complete service mesh setup with security policies
+  - [Advanced Network Policies](./week3/network-policies/) - Complex networking and security rules
+  - [Service Mesh Observability](./week3/observability/) - Distributed tracing and metrics configuration
+- **Mini-Project**: Deployed microservices application with Istio service mesh, including canary deployments and security policies.
 
-## Week 4: Advanced Observability (Loki, Tempo, Jaeger)
-- **Objective**: Master logging, tracing, and secrets management.
+## Week 4: Cloud Platforms & Infrastructure
+- **Objective**: Learn cloud-native Kubernetes deployment and Infrastructure as Code for production environments.
 - **Tasks**:
-  - Configured Loki for logs, Tempo/Jaeger for traces.
-  - Instrumented app with OpenTelemetry, stored secrets in Kubernetes Secrets.
-  - Debugged tracing/logging issues.
+  - Deployed and managed EKS/GKE clusters with advanced configurations.
+  - Used Terraform to provision complete Kubernetes infrastructure.
+  - Integrated cloud services (databases, storage, load balancers).
+  - Implemented multi-cloud and hybrid cloud strategies.
 - **Artifacts**:
-  - [OpenTelemetry Config](./week4/otel-config.yaml)
-  - [Secrets YAML](./week4/secrets.yaml)
-- **Mini-Project**: Deployed a multi-service app with unified observability.
+  - [Terraform Infrastructure](./week4/terraform/) - Complete IaC for Kubernetes clusters and services
+  - [Cloud Platform Configs](./week4/eks-gke/) - EKS and GKE cluster configurations
+  - [Multi-Cloud Strategy](./week4/multi-cloud/) - Hybrid cloud deployment patterns
+- **Mini-Project**: Deployed production application across multiple cloud providers with Terraform and cloud-native services.
 
-## Week 5: Service Mesh (Istio)
-- **Objective**: Learn Istio for microservices and security.
+## Week 5: Advanced Observability & SRE
+- **Objective**: Master distributed tracing, centralized logging, and SRE principles for production systems.
 - **Tasks**:
-  - Installed Istio, deployed Bookinfo app.
-  - Configured routing, mTLS, circuit breakers, and traffic mirroring.
-  - Debugged Istio issues with `istioctl`, compared Istio vs. Linkerd.
+  - Implemented distributed tracing with Jaeger and OpenTelemetry.
+  - Set up centralized logging with Loki and log aggregation.
+  - Defined comprehensive SLOs/SLIs and implemented error budgets.
+  - Built incident response processes and automated runbooks.
 - **Artifacts**:
-  - [Istio Virtual Service](./week5/virtual-service.yaml)
-  - [Comparison Table](./week5/istio-vs-linkerd.md)
-- **Mini-Project**: Deployed a microservices app with Istio and monitoring.
+  - [Distributed Tracing](./week5/tracing/) - Jaeger and OpenTelemetry configurations
+  - [Centralized Logging](./week5/logging/) - Loki and log aggregation setup
+  - [SLO Definitions](./week5/slo/) - Service level objectives and error budgets
+- **Mini-Project**: Implemented complete observability stack with tracing, logging, and SRE practices for a distributed system.
 
-## Week 6: CI/CD and SRE Principles
-- **Objective**: Master CI/CD pipelines and SRE concepts.
+## Week 6: Production Operations & Troubleshooting
+- **Objective**: Master production operations, advanced debugging techniques, and performance optimization.
 - **Tasks**:
-  - Built Jenkins pipeline with parallel stages.
-  - Created Argo Workflows for task orchestration.
-  - Defined SLOs/SLIs, calculated error budget, simulated on-call response.
+  - Advanced Kubernetes troubleshooting and debugging techniques.
+  - Performance analysis, profiling, and optimization strategies.
+  - Security hardening, compliance, and audit logging.
+  - Comprehensive backup/restore strategies and disaster recovery testing.
 - **Artifacts**:
-  - [Jenkinsfile](./week6/Jenkinsfile)
-  - [SLO Definition](./week6/slo.md)
-- **Mini-Project**: Deployed app with Jenkins/ArgoCD, monitored SLOs.
+  - [Debugging Guides](./week6/troubleshooting/) - Systematic troubleshooting methodologies
+  - [Performance Tuning](./week6/performance/) - Optimization strategies and benchmarks
+  - [Security Hardening](./week6/security/) - Production security configurations
+- **Mini-Project**: Optimized a production Kubernetes cluster with comprehensive monitoring, security, and performance improvements.
 
-## Week 7: Cloud (AWS/EKS, GCP/GKE) and Terraform
-- **Objective**: Learn cloud-native Kubernetes and IaC.
+## Week 7: Enterprise Patterns & Architecture
+- **Objective**: Learn enterprise-grade patterns, policy management, and cost optimization strategies.
 - **Tasks**:
-  - Created EKS/GKE clusters, deployed apps.
-  - Used Terraform to provision EKS, experimented with Cloud SQL.
-  - Analyzed costs with AWS Cost Explorer.
+  - Multi-cluster management, federation, and centralized governance.
+  - Policy as Code implementation with Kyverno and OPA.
+  - Advanced GitOps security patterns and compliance automation.
+  - Cost optimization strategies and FinOps implementation.
 - **Artifacts**:
-  - [Terraform Scripts](./week7/terraform/)
-  - [Cost Analysis](./week7/cost-analysis.md)
-- **Mini-Project**: Deployed app to EKS with Terraform and Cloud SQL.
+  - [Multi-Cluster Management](./week7/multi-cluster/) - Federation and centralized governance
+  - [Policy as Code](./week7/policies/) - Kyverno and OPA policy implementations
+  - [Cost Optimization](./week7/finops/) - FinOps strategies and automation
+- **Mini-Project**: Implemented enterprise-grade multi-cluster platform with policy management, cost optimization, and compliance automation.
 
-## Week 8: Databases, Chaos Engineering, and Interview Prep
-- **Objective**: Learn stateful apps, chaos engineering, and interview skills.
+## Week 8: Capstone & Interview Preparation
+- **Objective**: System design practice, chaos engineering, and comprehensive interview preparation for DevOps/SRE roles.
 - **Tasks**:
-  - Deployed Postgres with Operator, configured backups with Velero.
-  - Ran chaos experiments with LitmusChaos.
-  - Designed a Kubernetes system, practiced coding and behavioral interviews.
+  - Designed and implemented complex Kubernetes systems architecture.
+  - Chaos engineering practices with comprehensive resilience testing.
+  - Production case studies, incident analysis, and war stories.
+  - Technical and behavioral interview preparation with mock sessions.
 - **Artifacts**:
-  - [Postgres Operator YAML](./week8/postgres.yaml)
-  - [Chaos Experiment Log](./week8/chaos.md)
-  - [System Design Diagram](./week8/design.png)
-- **Capstone Project**: Deployed Flask + Postgres app to EKS/GKE with Terraform, ArgoCD, Istio, and observability. Tested resilience and optimized costs.
+  - [Architecture Designs](./week8/system-design/) - Complex system design documentation
+  - [Chaos Experiments](./week8/chaos-engineering/) - Resilience testing and analysis
+  - [Production Case Studies](./week8/case-studies/) - Real-world incident analysis and solutions
+- **Capstone Project**: Designed and implemented enterprise-grade Kubernetes platform with multi-cluster management, advanced observability, policy as code, and comprehensive cost optimization - demonstrating complete DevOps/SRE mastery.
 
 ## Runbook
 - **Purpose**: Guide for deploying and managing the capstone project.
@@ -152,22 +171,17 @@ Deployed a Flask app with resource limits, Network Policy, and RBAC - demonstrat
 
 
 
-How the Plan Covers All DevOps/SRE Aspects
-The plan addresses all core pillars of DevOps and SRE:
+How the Revised Plan Covers All DevOps/SRE Aspects
+The updated plan comprehensively addresses all core pillars of DevOps and SRE:
 
-Automation: Python/Bash scripts, Argo Workflows.
-CI/CD: Jenkins, ArgoCD, pipeline optimization.
-IaC: Terraform, Kustomize, Helm.
-Containerization/Orchestration: Docker, Kubernetes, Network Policies, RBAC.
-Observability: Prometheus, Grafana, Loki, Tempo, Jaeger, OpenTelemetry.
-Reliability Engineering: SLOs, SLIs, error budgets, incident response.
-Networking/Security: Istio mTLS, Secrets, Trivy, Network Policies.
-Collaboration: Developer guides, runbooks, explaining concepts.
-Cloud/Multicloud: AWS/EKS, GCP/GKE, Cloud SQL, cost optimization.
-Chaos Engineering: LitmusChaos for resilience testing.
-Performance Optimization: HPA, resource quotas.
-Tooling/Ecosystem: CNCF tools (Fluentd, Linkerd), landscape exploration.
-Team Dynamics: DevOps culture, collaboration scenarios.
+**Kubernetes Mastery**: Complete foundation from basics to advanced patterns and operators.
+**Advanced Development**: Custom controllers, operators, CRDs, and admission webhooks.
+**Service Mesh & Networking**: Istio, mTLS, circuit breakers, advanced network policies.
+**Cloud-Native Infrastructure**: EKS/GKE, Terraform, multi-cloud strategies.
+**Production Observability**: Distributed tracing, centralized logging, SLO implementation.
+**Operational Excellence**: Advanced troubleshooting, performance optimization, security hardening.
+**Enterprise Patterns**: Multi-cluster federation, policy as code, FinOps.
+**System Architecture**: Complex system design, chaos engineering, production case studies.
 
 
 Tips for Success

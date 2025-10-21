@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1 Day 3: StatefulSets, Storage & Ingress - DevOps/SRE Learning Portfolio</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .breadcrumb {
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        h1, h2, h3 {
+            color: #667eea;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .goal-box {
+            background: #e8f5e8;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        .task-list li:before {
+            content: "🚀";
+            margin-right: 10px;
+            color: #667eea;
+        }
+
+        .component-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .component-box h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        .mermaid {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+
+        .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+        }
+
+        .nav-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .flow-steps {
+            counter-reset: step-counter;
+            list-style: none;
+            padding: 0;
+        }
+
+        .flow-steps li {
+            counter-increment: step-counter;
+            padding: 15px 0;
+            border-bottom: 1px solid #e1e4e8;
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .flow-steps li:before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 15px;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-block .comment {
+            color: #a0aec0;
+        }
+
+        .code-block .keyword {
+            color: #9f7aea;
+        }
+
+        .code-block .string {
+            color: #68d391;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .mermaid {
+                padding: 10px;
+                margin: 15px 0;
+            }
+
+            .mermaid svg {
+                transform: scale(0.8);
+                transform-origin: top left;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mermaid svg {
+                transform: scale(0.6);
+                transform-origin: top left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐳 Week 1: Kubernetes, Docker, Networking, and Security</h1>
+            <p>Day 3: StatefulSets, Persistent Storage, and Ingress Controllers</p>
+        </div>
+
+        <div class="breadcrumb">
+            <a href="../../index.html">Home</a> >
+            <a href="../../documentation.html">Documentation</a> >
+            <a href="../README.html">Week 1</a> >
+            Day 3: StatefulSets & Storage
+        </div>
+
+        <div class="content">
+            <h1>Day 3: StatefulSets, Persistent Storage, and Ingress Controllers (6 hours)</h1>
+
+            <div class="goal-box">
+                <h3>🎯 Goal</h3>
+                <p>Master stateful applications, persistent storage management, and advanced networking with Ingress controllers.</p>
+            </div>
+
+            <h2>📚 Learning Objectives</h2>
+            <ul class="task-list">
+                <li>Learn: StatefulSets for stateful applications and persistent storage</li>
+                <li>Practice: Configure PersistentVolumes and PersistentVolumeClaims</li>
+                <li>Task: Deploy a stateful application with persistent data</li>
+                <li>Master: Ingress controllers for advanced routing and load balancing</li>
+                <li>Resources: Kubernetes storage documentation and Ingress guides</li>
+            </ul>
+
+            <h2>🏗️ StatefulSets Overview</h2>
+            <p>StatefulSets are used for stateful applications that require persistent storage, stable network identities, and ordered deployment/scaling.</p>
+
+            <div class="component-box">
+                <h3>🎯 StatefulSet Use Cases</h3>
+                <ul>
+                    <li><strong>Databases:</strong> MySQL, PostgreSQL, MongoDB clusters</li>
+                    <li><strong>Message Queues:</strong> Kafka, RabbitMQ with persistent storage</li>
+                    <li><strong>Distributed Storage:</strong> Ceph, GlusterFS clusters</li>
+                    <li><strong>Machine Learning:</strong> Stateful training jobs with data persistence</li>
+                    <li><strong>Any app requiring:</strong> Stable network IDs, persistent storage, ordered operations</li>
+                </ul>
+            </div>
+
+            <h2>💾 Persistent Storage Architecture</h2>
+
+            <div class="mermaid">
+                graph TB
+                    subgraph "Storage Architecture"
+                        PV[PersistentVolume<br/>Physical Storage]
+                        PVC[PersistentVolumeClaim<br/>Storage Request]
+                        POD[Pod<br/>Application]
+                        SC[StorageClass<br/>Storage Provisioner]
+                    end
+
+                    SC --> PV
+                    PV --> PVC
+                    PVC --> POD
+
+                    %% Styling
+                    classDef storage fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+                    classDef claim fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+                    classDef pod fill:#e8f5e8,stroke:#2e7d32,stroke-width:1px
+                    classDef sc fill:#fff3e0,stroke:#e65100,stroke-width:2px
+
+                    class PV storage
+                    class PVC claim
+                    class POD pod
+                    class SC sc
+            </div>
+
+            <h2>🚀 Hands-On Practice: StatefulSets</h2>
+
+            <div class="component-box">
+                <h3>📝 Step 1: Create PersistentVolume</h3>
+                <p>First, let's create a PersistentVolume for storage:</p>
+
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">v1</span>
+<span class="keyword">kind</span>: <span class="string">PersistentVolume</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">mysql-pv</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">capacity</span>:
+    <span class="keyword">storage</span>: <span class="string">5Gi</span>
+  <span class="keyword">accessModes</span>:
+    - <span class="string">ReadWriteOnce</span>
+  <span class="keyword">hostPath</span>:
+    <span class="keyword">path</span>: <span class="string">/data/mysql</span>
+</div>
+
+                <h4>Apply the PV:</h4>
+                <pre><code>kubectl apply -f practice/persistent-volume.yaml</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>💾 Step 2: Create PersistentVolumeClaim</h3>
+                <p>Create a claim to request storage:</p>
+
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">v1</span>
+<span class="keyword">kind</span>: <span class="string">PersistentVolumeClaim</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">mysql-pvc</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">accessModes</span>:
+    - <span class="string">ReadWriteOnce</span>
+  <span class="keyword">resources</span>:
+    <span class="keyword">requests</span>:
+      <span class="keyword">storage</span>: <span class="string">5Gi</span>
+</div>
+
+                <h4>Apply and verify:</h4>
+                <pre><code>kubectl apply -f practice/persistent-volume-claim.yaml
+kubectl get pv,pvc</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>🏗️ Step 3: Create StatefulSet</h3>
+                <p>Create a StatefulSet for a stateful application:</p>
+
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">apps/v1</span>
+<span class="keyword">kind</span>: <span class="string">StatefulSet</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">mysql-statefulset</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">serviceName</span>: <span class="string">mysql-service</span>
+  <span class="keyword">replicas</span>: <span class="string">3</span>
+  <span class="keyword">selector</span>:
+    <span class="keyword">matchLabels</span>:
+      <span class="keyword">app</span>: <span class="string">mysql</span>
+  <span class="keyword">template</span>:
+    <span class="keyword">metadata</span>:
+      <span class="keyword">labels</span>:
+        <span class="keyword">app</span>: <span class="string">mysql</span>
+    <span class="keyword">spec</span>:
+      <span class="keyword">containers</span>:
+      - <span class="keyword">name</span>: <span class="string">mysql</span>
+        <span class="keyword">image</span>: <span class="string">mysql:8.0</span>
+        <span class="keyword">ports</span>:
+        - <span class="keyword">containerPort</span>: <span class="string">3306</span>
+        <span class="keyword">env</span>:
+        - <span class="keyword">name</span>: <span class="string">MYSQL_ROOT_PASSWORD</span>
+          <span class="keyword">valueFrom</span>:
+            <span class="keyword">secretKeyRef</span>:
+              <span class="keyword">name</span>: <span class="string">mysql-secret</span>
+              <span class="keyword">key</span>: <span class="string">password</span>
+        <span class="keyword">volumeMounts</span>:
+        - <span class="keyword">name</span>: <span class="string">mysql-data</span>
+          <span class="keyword">mountPath</span>: <span class="string">/var/lib/mysql</span>
+  <span class="keyword">volumeClaimTemplates</span>:
+  - <span class="keyword">metadata</span>:
+      <span class="keyword">name</span>: <span class="string">mysql-data</span>
+    <span class="keyword">spec</span>:
+      <span class="keyword">accessModes</span>: [<span class="string">"ReadWriteOnce"</span>]
+      <span class="keyword">resources</span>:
+        <span class="keyword">requests</span>:
+          <span class="keyword">storage</span>: <span class="string">5Gi</span>
+</div>
+
+                <h4>Apply the StatefulSet:</h4>
+                <pre><code>kubectl apply -f practice/statefulset.yaml</code></pre>
+            </div>
+
+            <h2>🌐 Ingress Controllers</h2>
+
+            <div class="component-box">
+                <h3>🚪 Ingress Benefits</h3>
+                <ul>
+                    <li><strong>Load Balancing:</strong> Distribute traffic across multiple services</li>
+                    <li><strong>SSL/TLS Termination:</strong> Handle HTTPS certificates</li>
+                    <li><strong>Virtual Hosting:</strong> Route based on hostnames</li>
+                    <li><strong>Path-based Routing:</strong> Route based on URL paths</li>
+                    <li><strong>Advanced Features:</strong> Rate limiting, authentication, rewriting</li>
+                </ul>
+            </div>
+
+            <div class="component-box">
+                <h3>📝 Step 4: Install NGINX Ingress Controller</h3>
+                <p>Install the NGINX Ingress Controller in your cluster:</p>
+
+                <h4>Using kubectl:</h4>
+                <pre><code># Deploy NGINX Ingress Controller
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.10.1/deploy/static/provider/cloud/deploy.yaml</code></pre>
+
+                <h4>Verify installation:</h4>
+                <pre><code>kubectl get pods -n ingress-nginx
+kubectl get services -n ingress-nginx</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>🔗 Step 5: Create Ingress Resource</h3>
+                <p>Create an Ingress resource to route traffic:</p>
+
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">networking.k8s.io/v1</span>
+<span class="keyword">kind</span>: <span class="string">Ingress</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">example-ingress</span>
+  <span class="keyword">annotations</span>:
+    <span class="keyword">nginx.ingress.kubernetes.io/rewrite-target</span>: <span class="string">/</span>
+<span class="keyword">spec</span>:
+  <span class="keyword">ingressClassName</span>: <span class="string">nginx</span>
+  <span class="keyword">tls</span>:
+  - <span class="keyword">hosts</span>:
+    - <span class="string">myapp.example.com</span>
+    <span class="keyword">secretName</span>: <span class="string">myapp-tls</span>
+  <span class="keyword">rules</span>:
+  - <span class="keyword">host</span>: <span class="string">myapp.example.com</span>
+    <span class="keyword">http</span>:
+      <span class="keyword">paths</span>:
+      - <span class="keyword">path</span>: <span class="string">/api</span>
+        <span class="keyword">pathType</span>: <span class="string">Prefix</span>
+        <span class="keyword">backend</span>:
+          <span class="keyword">service</span>:
+            <span class="keyword">name</span>: <span class="string">backend-service</span>
+            <span class="keyword">port</span>:
+              <span class="keyword">number</span>: <span class="string">80</span>
+      - <span class="keyword">path</span>: <span class="string">/</span>
+        <span class="keyword">pathType</span>: <span class="string">Prefix</span>
+        <span class="keyword">backend</span>:
+          <span class="keyword">service</span>:
+            <span class="keyword">name</span>: <span class="string">frontend-service</span>
+            <span class="keyword">port</span>:
+              <span class="keyword">number</span>: <span class="string">80</span>
+</div>
+
+                <h4>Apply the Ingress:</h4>
+                <pre><code>kubectl apply -f practice/ingress.yaml</code></pre>
+            </div>
+
+            <h2>💾 Storage Classes</h2>
+
+            <div class="component-box">
+                <h3>🏗️ Step 6: Create StorageClass</h3>
+                <p>Create a StorageClass for dynamic provisioning:</p>
+
+                <div class="code-block">
+<span class="keyword">apiVersion</span>: <span class="string">storage.k8s.io/v1</span>
+<span class="keyword">kind</span>: <span class="string">StorageClass</span>
+<span class="keyword">metadata</span>:
+  <span class="keyword">name</span>: <span class="string">fast-ssd</span>
+<span class="keyword">provisioner</span>: <span class="string">kubernetes.io/no-provisioner</span>
+<span class="keyword">volumeBindingMode</span>: <span class="string">WaitForFirstConsumer</span>
+<span class="keyword">parameters</span>:
+  <span class="keyword">type</span>: <span class="string">gp3</span>
+  <span class="keyword">fsType</span>: <span class="string">ext4</span>
+</div>
+
+                <h4>Set as default StorageClass:</h4>
+                <pre><code>kubectl patch storageclass fast-ssd -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'</code></pre>
+            </div>
+
+            <h2>🔧 Essential kubectl Commands</h2>
+
+            <div class="component-box">
+                <h3>📋 StatefulSet Commands</h3>
+                <pre><code># Scale StatefulSet
+kubectl scale statefulset mysql-statefulset --replicas=5
+
+# Update StatefulSet image
+kubectl patch statefulset mysql-statefulset -p '{"spec":{"template":{"spec":{"containers":[{"name":"mysql","image":"mysql:8.1"}]}}}}'
+
+# Check StatefulSet status
+kubectl rollout status statefulset/mysql-statefulset
+
+# View pod names (stable network IDs)
+kubectl get pods -l app=mysql</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>💾 Storage Commands</h3>
+                <pre><code># List storage resources
+kubectl get pv,pvc,storageclass
+
+# Describe persistent volume
+kubectl describe pv <pv-name>
+
+# Check storage usage
+kubectl exec mysql-statefulset-0 -- df -h /var/lib/mysql
+
+# Resize PVC (if supported)
+kubectl patch pvc mysql-pvc -p '{"spec":{"resources":{"requests":{"storage":"10Gi"}}}}'</code></pre>
+            </div>
+
+            <div class="component-box">
+                <h3>🌐 Ingress Commands</h3>
+                <pre><code># Get Ingress resources
+kubectl get ingress
+
+# Describe Ingress
+kubectl describe ingress <ingress-name>
+
+# Check Ingress Controller logs
+kubectl logs -n ingress-nginx deployment/ingress-nginx-controller
+
+# Test Ingress configuration
+kubectl exec -n ingress-nginx deployment/ingress-nginx-controller -- curl -H "Host: myapp.example.com" http://localhost/api</code></pre>
+            </div>
+
+            <h2>📚 Daily Tasks</h2>
+            <div class="goal-box">
+                <h3>✅ Today's Checklist</h3>
+                <ul class="task-list">
+                    <li>Create and manage PersistentVolumes and PersistentVolumeClaims</li>
+                    <li>Deploy a StatefulSet with persistent storage</li>
+                    <li>Install and configure NGINX Ingress Controller</li>
+                    <li>Create Ingress resources for traffic routing</li>
+                    <li>Configure StorageClasses for dynamic provisioning</li>
+                    <li>Test stateful application scaling and updates</li>
+                    <li>Practice storage and networking debugging</li>
+                </ul>
+            </div>
+
+            <h2>🎯 Best Practices</h2>
+            <div class="component-box">
+                <h3>💡 StatefulSet Best Practices</h3>
+                <ul>
+                    <li><strong>Stable Network IDs:</strong> Use StatefulSets when pods need stable names</li>
+                    <li><strong>Persistent Storage:</strong> Always use volumeClaimTemplates for data persistence</li>
+                    <li><strong>Ordered Operations:</strong> Scaling and updates happen in order</li>
+                    <li><strong>Resource Management:</strong> Set appropriate resource requests and limits</li>
+                    <li><strong>Backup Strategy:</strong> Implement proper backup for stateful data</li>
+                </ul>
+            </div>
+
+            <div class="component-box">
+                <h3>🌐 Ingress Best Practices</h3>
+                <ul>
+                    <li><strong>Use Ingress Classes:</strong> Specify ingress class for controller selection</li>
+                    <li><strong>SSL/TLS:</strong> Always use TLS for production traffic</li>
+                    <li><strong>Rate Limiting:</strong> Configure rate limiting for DDoS protection</li>
+                    <li><strong>Health Checks:</strong> Configure proper health checks for backends</li>
+                    <li><strong>Monitoring:</strong> Monitor ingress controller metrics and logs</li>
+                </ul>
+            </div>
+
+            <h2>📚 Resources</h2>
+            <ul>
+                <li><a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/" target="_blank">StatefulSets Documentation</a></li>
+                <li><a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/" target="_blank">Persistent Volumes Guide</a></li>
+                <li><a href="https://kubernetes.io/docs/concepts/services-networking/ingress/" target="_blank">Ingress Documentation</a></li>
+                <li><a href="https://kubernetes.github.io/ingress-nginx/" target="_blank">NGINX Ingress Controller</a></li>
+            </ul>
+
+            <div class="nav-buttons">
+                <a href="../../index.html" class="btn">← Back to Home</a>
+                <a href="../../documentation.html" class="btn">← Back to Documentation</a>
+                <a href="../README.html" class="btn">← Back to Week 1</a>
+                <a href="practice/" class="btn">🚀 Practice Exercises</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Mermaid with mobile-friendly settings
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            },
+            securityLevel: 'loose',
+            responsive: true
+        });
+
+        // Handle mobile viewport
+        function adjustMermaidForMobile() {
+            const mermaidDivs = document.querySelectorAll('.mermaid');
+            mermaidDivs.forEach(div => {
+                const svg = div.querySelector('svg');
+                if (svg && window.innerWidth <= 768) {
+                    svg.style.maxWidth = '100%';
+                    svg.style.height = 'auto';
+                }
+            });
+        }
+
+        // Adjust on load and resize
+        window.addEventListener('load', adjustMermaidForMobile);
+        window.addEventListener('resize', adjustMermaidForMobile);
+    </script>
+</body>
+</html>

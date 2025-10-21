@@ -1,0 +1,328 @@
+---
+# Troubleshooting Guide Configuration
+# Prometheus rules for common issues
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kubernetes-troubleshooting-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: kubernetes-troubleshooting
+    rules:
+    - alert: KubePodCrashLooping
+      expr: increase(kube_pod_container_status_restarts_total[10m]) > 5
+      for: 5m
+      labels:
+        severity: warning
+        category: pod
+      annotations:
+        summary: "Pod {{ $labels.pod }} is crash looping"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has restarted {{ $value }} times in the last 10 minutes"
+
+    - alert: KubePodNotReady
+      expr: kube_pod_status_ready{condition="false"} == 1
+      for: 5m
+      labels:
+        severity: warning
+        category: pod
+      annotations:
+        summary: "Pod {{ $labels.pod }} is not ready"
+        description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has been not ready for more than 5 minutes"
+
+    - alert: KubeNodeNotReady
+      expr: kube_node_status_condition{condition="Ready",status="false"} == 1
+      for: 5m
+      labels:
+        severity: critical
+        category: node
+      annotations:
+        summary: "Node {{ $labels.node }} is not ready"
+        description: "Node {{ $labels.node }} has been not ready for more than 5 minutes"
+
+    - alert: KubeDeploymentReplicasMismatch
+      expr: kube_deployment_spec_replicas != kube_deployment_status_replicas_available
+      for: 10m
+      labels:
+        severity: warning
+        category: deployment
+      annotations:
+        summary: "Deployment {{ $labels.deployment }} has mismatched replicas"
+        description: "Deployment {{ $labels.deployment }} in namespace {{ $labels.namespace }} has {{ $value }} unavailable replicas"
+
+    - alert: KubePersistentVolumeFillingUp
+      expr: kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes * 100 < 10
+      for: 5m
+      labels:
+        severity: warning
+        category: storage
+      annotations:
+        summary: "Persistent volume {{ $labels.persistentvolumeclaim }} is filling up"
+        description: "Persistent volume {{ $labels.persistentvolumeclaim }} in namespace {{ $labels.namespace }} has only {{ $value }}% free space"
+
+    - alert: KubeMemoryOvercommit
+      expr: sum(container_memory_usage_bytes) / sum(container_spec_memory_limit_bytes) * 100 > 90
+      for: 5m
+      labels:
+        severity: warning
+        category: resource
+      annotations:
+        summary: "Cluster memory overcommitment detected"
+        description: "Cluster memory usage is {{ $value }}% of total limits"
+
+    - alert: KubeCPUOvercommit
+      expr: sum(container_cpu_usage_seconds_total) / sum(container_spec_cpu_limit) * 100 > 90
+      for: 5m
+      labels:
+        severity: warning
+        category: resource
+      annotations:
+        summary: "Cluster CPU overcommitment detected"
+        description: "Cluster CPU usage is {{ $value }}% of total limits"
+
+---
+# Diagnostic tools deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: diagnostic-tools
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: diagnostic-tools
+  template:
+    metadata:
+      labels:
+        app: diagnostic-tools
+    spec:
+      containers:
+      - name: tools
+        image: wbitt/network-multitool:latest
+        ports:
+        - containerPort: 8080
+        command:
+        - /bin/sh
+        - -c
+        - |
+          apk add --no-cache curl wget tcpdump netcat-openbsd bind-tools net-tools mtr iperf3
+          python3 -m http.server 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+
+---
+# Network diagnostic service
+apiVersion: v1
+kind: Service
+metadata:
+  name: diagnostic-tools
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app: diagnostic-tools
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+
+---
+# Troubleshooting ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: troubleshooting-scripts
+  namespace: default
+data:
+  pod-debug.sh: |
+    #!/bin/bash
+    # Pod debugging script
+
+    POD_NAME=$1
+    NAMESPACE=${2:-default}
+
+    if [ -z "$POD_NAME" ]; then
+        echo "Usage: $0 <pod-name> [namespace]"
+        exit 1
+    fi
+
+    echo "=== Pod Information ==="
+    kubectl describe pod $POD_NAME -n $NAMESPACE
+
+    echo -e "\n=== Pod Logs ==="
+    kubectl logs $POD_NAME -n $NAMESPACE --previous
+
+    echo -e "\n=== Pod Events ==="
+    kubectl get events -n $NAMESPACE --field-selector involvedObject.name=$POD_NAME
+
+    echo -e "\n=== Container Shell Access Test ==="
+    kubectl exec -it $POD_NAME -n $NAMESPACE -- /bin/sh -c 'echo "Shell access: OK"' || echo "Shell access: FAILED"
+
+  node-debug.sh: |
+    #!/bin/bash
+    # Node debugging script
+
+    NODE_NAME=$1
+
+    if [ -z "$NODE_NAME" ]; then
+        echo "Usage: $0 <node-name>"
+        exit 1
+    fi
+
+    echo "=== Node Information ==="
+    kubectl describe node $NODE_NAME
+
+    echo -e "\n=== Node Conditions ==="
+    kubectl get node $NODE_NAME -o json | jq -r '.status.conditions[] | "\(.type): \(.status) - \(.message)"'
+
+    echo -e "\n=== Node Resources ==="
+    kubectl get node $NODE_NAME -o json | jq -r '.status.capacity, .status.allocatable'
+
+    echo -e "\n=== Pods on Node ==="
+    kubectl get pods -A --field-selector spec.nodeName=$NODE_NAME -o wide
+
+  network-debug.sh: |
+    #!/bin/bash
+    # Network debugging script
+
+    NAMESPACE=${1:-default}
+
+    echo "=== Service Endpoints ==="
+    kubectl get endpoints -n $NAMESPACE
+
+    echo -e "\n=== Network Policies ==="
+    kubectl get networkpolicies -n $NAMESPACE -o yaml
+
+    echo -e "\n=== DNS Resolution Test ==="
+    kubectl run test-dns --image=busybox:1.28 --rm -it --restart=Never -- nslookup kubernetes.default
+
+    echo -e "\n=== Service Discovery Test ==="
+    kubectl run test-service --image=busybox:1.28 --rm -it --restart=Never -- wget -O- http://kubernetes.default/api
+
+  storage-debug.sh: |
+    #!/bin/bash
+    # Storage debugging script
+
+    echo "=== Persistent Volumes ==="
+    kubectl get pv -o wide
+
+    echo -e "\n=== Persistent Volume Claims ==="
+    kubectl get pvc -A -o wide
+
+    echo -e "\n=== Storage Classes ==="
+    kubectl get storageclass -o wide
+
+    echo -e "\n=== Volume Attachments ==="
+    kubectl get volumeattachments -o wide
+
+    echo -e "\n=== CSI Drivers ==="
+    kubectl get csidrivers -o wide
+
+  performance-debug.sh: |
+    #!/bin/bash
+    # Performance debugging script
+
+    echo "=== Cluster Performance ==="
+    kubectl top nodes || echo "Metrics server not available"
+
+    echo -e "\n=== Pod Performance ==="
+    kubectl top pods -A --sort-by=cpu | head -20 || echo "Metrics server not available"
+
+    echo -e "\n=== Resource Requests vs Limits ==="
+    kubectl describe nodes | grep -A 5 "Allocated resources"
+
+    echo -e "\n=== High Resource Usage Pods ==="
+    kubectl top pods -A --sort-by=memory | tail -10
+
+---
+# Troubleshooting RBAC
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: troubleshooting-role
+  namespace: default
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "describe", "logs", "exec"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "describe"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["networkpolicies"]
+  verbs: ["get", "list", "describe"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: troubleshooting-binding
+  namespace: default
+subjects:
+- kind: ServiceAccount
+  name: troubleshooting-sa
+  namespace: default
+roleRef:
+  kind: Role
+  name: troubleshooting-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# Service account for troubleshooting
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: troubleshooting-sa
+  namespace: default
+
+---
+# Troubleshooting dashboard
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: troubleshooting-dashboard
+  namespace: default
+data:
+  dashboard.json: |
+    {
+      "dashboard": {
+        "title": "Kubernetes Troubleshooting Dashboard",
+        "panels": [
+          {
+            "title": "Pod Status",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "kube_pod_status_phase",
+                "legendFormat": "{{ phase }}"
+              }
+            ]
+          },
+          {
+            "title": "Node Status",
+            "type": "table",
+            "targets": [
+              {
+                "expr": "kube_node_status_condition",
+                "legendFormat": "{{ condition }}"
+              }
+            ]
+          },
+          {
+            "title": "Resource Usage",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "sum(rate(container_cpu_usage_seconds_total[5m])) by (namespace)",
+                "legendFormat": "{{ namespace }}"
+              }
+            ]
+          }
+        ]
+      }
+    }

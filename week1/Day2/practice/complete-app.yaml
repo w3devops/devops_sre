@@ -1,0 +1,158 @@
+---
+# Complete Multi-Tier Application Example
+# This demonstrates a web application with frontend and backend
+
+# Backend API Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-api
+  labels:
+    app: backend
+    tier: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+      tier: api
+  template:
+    metadata:
+      labels:
+        app: backend
+        tier: api
+    spec:
+      containers:
+      - name: backend
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-secret
+              key: database_url
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: redis_host
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+
+---
+# Frontend Web Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-web
+  labels:
+    app: frontend
+    tier: web
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend
+      tier: web
+  template:
+    metadata:
+      labels:
+        app: frontend
+        tier: web
+    spec:
+      containers:
+      - name: frontend
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: app-config
+          mountPath: /usr/share/nginx/html
+        - name: nginx-config
+          mountPath: /etc/nginx/nginx.conf
+          subPath: nginx.conf
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+      volumes:
+      - name: app-config
+        configMap:
+          name: nginx-config
+          items:
+          - key: index.html
+            path: index.html
+      - name: nginx-config
+        configMap:
+          name: nginx-config
+          items:
+          - key: nginx.conf
+            path: nginx.conf
+
+---
+# Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  labels:
+    app: backend
+    tier: api
+spec:
+  type: ClusterIP
+  selector:
+    app: backend
+    tier: api
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+
+---
+# Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  labels:
+    app: frontend
+    tier: web
+spec:
+  type: NodePort
+  selector:
+    app: frontend
+    tier: web
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30081
+    protocol: TCP
+
+---
+# Load Balancer Service (for production)
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-loadbalancer
+  labels:
+    app: frontend
+    tier: web
+spec:
+  type: LoadBalancer
+  selector:
+    app: frontend
+    tier: web
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP

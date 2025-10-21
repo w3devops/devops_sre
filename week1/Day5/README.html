@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1 Day 5: CI/CD, GitOps & Advanced Deployments - DevOps/SRE Learning Portfolio</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .nav-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 5px;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #5a6fd8;
+        }
+        pre {
+            background: #f6f8fa;
+            padding: 16px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: 'Courier New', monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐳 Week 1: Kubernetes, Docker, Networking, and Security</h1>
+            <p>Day 5: CI/CD Integration, GitOps, and Advanced Deployment Strategies</p>
+        </div>
+
+        <div class="content">
+            <h2>Day 5: CI/CD Integration, GitOps, and Advanced Deployment Strategies (6 hours)</h2>
+            <ul>
+                <li><strong>Learn:</strong> CI/CD pipeline integration with Kubernetes</li>
+                <li><strong>Practice:</strong> GitOps workflows with ArgoCD and Flux</li>
+                <li><strong>Task:</strong> Implement automated deployment strategies</li>
+                <li><strong>Master:</strong> Advanced deployment patterns (Canary, Blue-Green)</li>
+            </ul>
+
+            <h2>CI/CD Pipeline Architecture</h2>
+            <p>Modern CI/CD pipelines integrate seamlessly with Kubernetes to provide automated, reliable deployments with proper testing and validation.</p>
+
+            <h3>Pipeline Stages</h3>
+            <ul>
+                <li><strong>Source Control:</strong> Code commit triggers pipeline</li>
+                <li><strong>Build & Test:</strong> Compile, test, and validate code</li>
+                <li><strong>Container Build:</strong> Create and push container images</li>
+                <li><strong>Security Scanning:</strong> Scan images for vulnerabilities</li>
+                <li><strong>Deploy:</strong> Deploy to Kubernetes clusters</li>
+                <li><strong>Verification:</strong> Test deployment and functionality</li>
+            </ul>
+
+            <h2>Essential Commands</h2>
+
+            <h3>GitHub Actions CI/CD</h3>
+            <pre><code># Create workflow file
+mkdir -p .github/workflows
+
+# Update image tag in deployment
+sed -i "s|IMAGE_TAG|$NEW_TAG|g" k8s/deployment.yaml
+
+# Apply Kubernetes manifests
+kubectl apply -f k8s/
+
+# Check rollout status
+kubectl rollout status deployment/myapp</code></pre>
+
+            <h3>ArgoCD GitOps</h3>
+            <pre><code># Install ArgoCD
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+# Create ArgoCD application
+argocd app create myapp --repo https://github.com/myorg/manifests --path k8s --dest-server https://kubernetes.default.svc --dest-namespace default
+
+# Sync application
+argocd app sync myapp
+
+# Check application health
+argocd app get myapp</code></pre>
+
+            <h3>Advanced Deployment Commands</h3>
+            <pre><code># Argo Rollouts for canary deployments
+kubectl argo rollouts promote myapp-canary
+kubectl argo rollouts get rollout myapp-canary
+
+# Blue-Green deployment switching
+kubectl scale deployment myapp-blue --replicas=0
+kubectl scale deployment myapp-green --replicas=3
+kubectl patch svc myapp-service -p '{"spec":{"selector":{"version":"green"}}}'</code></pre>
+
+            <h2>Deployment Strategy Comparison</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Pros</th>
+                        <th>Cons</th>
+                        <th>Use Case</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Rolling Update</strong></td>
+                        <td>Zero downtime, gradual</td>
+                        <td>Slower, complex rollback</td>
+                        <td>Most applications</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Canary</strong></td>
+                        <td>Low risk, data-driven</td>
+                        <td>Complex setup</td>
+                        <td>High-traffic apps</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Blue-Green</strong></td>
+                        <td>Instant rollback, isolated</td>
+                        <td>Resource intensive</td>
+                        <td>Critical applications</td>
+                    </tr>
+                    <tr>
+                        <td><strong>GitOps</strong></td>
+                        <td>Declarative, auditable</td>
+                        <td>Learning curve</td>
+                        <td>Infrastructure teams</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Daily Tasks Checklist</h2>
+            <ul>
+                <li>Set up GitHub Actions CI/CD pipeline</li>
+                <li>Install and configure ArgoCD for GitOps</li>
+                <li>Create automated deployment workflows</li>
+                <li>Implement canary deployment strategy</li>
+                <li>Set up blue-green deployment pattern</li>
+                <li>Configure multi-environment deployments</li>
+                <li>Practice rollback and recovery procedures</li>
+            </ul>
+
+            <h2>Key Takeaways</h2>
+            <ul>
+                <li><strong>CI/CD</strong> automates the software delivery lifecycle from code commit to production deployment</li>
+                <li><strong>GitOps</strong> uses Git as the single source of truth for infrastructure and application configuration</li>
+                <li><strong>Canary Deployments</strong> allow gradual rollout of new versions with risk mitigation</li>
+                <li><strong>Blue-Green Deployments</strong> provide instant rollback capabilities with isolated environments</li>
+                <li><strong>Multi-environment Management</strong> ensures consistency across development, staging, and production</li>
+            </ul>
+
+            <div class="nav-buttons">
+                <a href="../../index.html" class="btn">← Back to Home</a>
+                <a href="../../documentation.html" class="btn">← Back to Documentation</a>
+                <a href="../README.html" class="btn">← Back to Week 1</a>
+                <a href="./index.html" class="btn">View Full Day 5 Content</a>
+                <a href="practice/" class="btn">🚀 Practice Exercises</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
