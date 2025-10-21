@@ -550,16 +550,55 @@ You can view the list of minikube maintainers at: https://github.com/kubernetes/
             <div class="component-box">
                 <h3>🛠️ Useful Dashboard Commands</h3>
                 <p>Additional commands for dashboard management:</p>
-                <pre><code># Check dashboard status
-minikube dashboard --url
 
-# Enable other useful addons
+                <div class="goal-box">
+                    <h4>🔍 Dashboard Status Check</h4>
+                    <pre><code># Check dashboard status and get the URL without opening browser
+minikube dashboard --url</code></pre>
+                    <p><strong>What it does:</strong> Returns the dashboard URL that you can open manually in your browser</p>
+                    <p><strong>When to use:</strong> When you want to access the dashboard but prefer to open it yourself or share the URL</p>
+                    <p><strong>Expected Output:</strong> <code>http://127.0.0.1:XXXXX/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/</code></p>
+                </div>
+
+                <div class="goal-box">
+                    <h4>📦 Addons Management</h4>
+                    <pre><code># List all available addons
 minikube addons list
-minikube addons enable ingress
-minikube addons enable storage-provisioner
 
-# Access dashboard from remote machine
+# Enable ingress addon for load balancer support
+minikube addons enable ingress
+
+# Enable storage provisioner for persistent volumes
+minikube addons enable storage-provisioner</code></pre>
+                    <p><strong>What it does:</strong> Manages optional Kubernetes addons that extend cluster functionality</p>
+                    <p><strong>Addons explained:</strong></p>
+                    <ul>
+                        <li><strong>ingress:</strong> Enables ingress controller for advanced routing and load balancing</li>
+                        <li><strong>storage-provisioner:</strong> Automatically provisions persistent storage for applications</li>
+                        <li><strong>metrics-server:</strong> Provides resource usage metrics (already covered earlier)</li>
+                    </ul>
+                    <p><strong>Expected Output:</strong> Confirmation that the addon was enabled successfully</p>
+                </div>
+
+                <div class="goal-box">
+                    <h4>🌐 Remote Dashboard Access</h4>
+                    <pre><code># Access dashboard from remote machine on specific port
 minikube dashboard --url --port=8080</code></pre>
+                    <p><strong>What it does:</strong> Starts the dashboard proxy on a specific port for remote access</p>
+                    <p><strong>When to use:</strong> When accessing the dashboard from a different machine or when port conflicts exist</p>
+                    <p><strong>Security note:</strong> Only use this in trusted networks as it exposes the dashboard externally</p>
+                    <p><strong>Expected Output:</strong> Dashboard accessible at <code>http://[minikube-ip]:8080</code></p>
+                </div>
+
+                <div class="goal-box">
+                    <h4>💡 Pro Tips</h4>
+                    <ul>
+                        <li><strong>Dashboard persistence:</strong> The dashboard stays running until you stop it with Ctrl+C</li>
+                        <li><strong>Multiple sessions:</strong> You can access the dashboard from multiple browser tabs</li>
+                        <li><strong>Token authentication:</strong> Use the token from <code>kubectl describe secret</code> for secure access</li>
+                        <li><strong>Resource monitoring:</strong> Enable metrics-server addon for CPU/memory graphs in the dashboard</li>
+                    </ul>
+                </div>
             </div>
 
             <h2>🚀 Hands-On Practice: Deploy Nginx</h2>
