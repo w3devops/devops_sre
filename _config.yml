@@ -4,24 +4,18 @@ description: An 8-week journey to master cloud-native technologies and SRE princ
 author: Your Name
 email: your.email@example.com
 
-# Jekyll settings
+# Jekyll settings for static site
 markdown: kramdown
 highlighter: rouge
-permalink: pretty
 
-# Collections
-collections:
-  weeks:
-    output: true
-    permalink: /:collection/:name/
+# Use simple permalink structure for static HTML compatibility
+permalink: /:title/
 
 # Plugins
 plugins:
-  - jekyll-feed
   - jekyll-seo-tag
-  - jekyll-sitemap
 
-# Exclude from processing
+# Exclude from processing - keep HTML files as-is
 exclude:
   - Gemfile
   - Gemfile.lock
@@ -30,20 +24,11 @@ exclude:
   - vendor/cache/
   - vendor/gems/
   - vendor/ruby/
+  - "*.html"
 
-# Include CSS
+# Include assets
 include:
-  - assets/css/style.css
+  - assets
 
-# Defaults
-defaults:
-  - scope:
-      path: ""
-      type: "posts"
-    values:
-      layout: "post"
-  - scope:
-      path: ""
-      type: "weeks"
-    values:
-      layout: "week" 
+# Base URL (update for GitHub Pages if needed)
+# baseurl: /devops_sre
